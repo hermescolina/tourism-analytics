@@ -26,3 +26,4 @@ To provide real-time, actionable insights for tour operators and local tourism b
 **Hermes Colina**  
 [GitHub](https://github.com/hermescolina) | [LinkedIn](https://www.linkedin.com/in/hermes-colina)
 
+![Most Booked Tours](visuals/most_booked_tours.png)
