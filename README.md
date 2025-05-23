@@ -24,4 +24,5 @@ To provide real-time, actionable insights for tour operators and local tourism b
 
 ## 🔗 Author
 **Hermes Colina**  
-[GitHub](https://github.com/hermescolina) | [LinkedIn](https://www.linkedin.com/in/hermescolina)
+[GitHub](https://github.com/hermescolina) | [LinkedIn](https://www.linkedin.com/in/hermes-colina)
+
