@@ -22,6 +22,13 @@ This project demonstrates the power of combining SQL, Python, and data visualiza
 - `/visuals` – charts and visualizations
 - `/docs` – documentation and project notes
 
+## 🔮 Future Enhancements (Cloud & Scale)
+- Deploy MySQL database to **Amazon RDS** for remote access and backups
+- Host the analytics script as a **Lambda function** triggered by data uploads
+- Store booking data and visual outputs in **Amazon S3**
+- Set up a **scheduled job** (CloudWatch Events) for regular report generation
+- Add a **basic dashboard (React + API Gateway + Lambda)** for live analytics access
+
 ## 👤 Author
 Hermes Colina  
 [GitHub](https://github.com/hermescolina) | [LinkedIn](https://www.linkedin.com/in/hermes-colina)
