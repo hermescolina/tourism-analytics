@@ -1,39 +1,105 @@
-# 🌴 Tourism Analytics System
+# 📈 Live Dashboard: React + Flask + Kubernetes
 
-A data-powered analytics tool for the tourism industry.
+A real-time data visualization app using:
 
-## 📊 Features
-- Most Booked Tours Report
-- Total Revenue Calculation
-- Guest Distribution per User
+- ⚛️ React (Chart.js) frontend
+- 🐍 Flask API backend
+- 🐳 Docker for containerization
+- ☸️ Kubernetes (Minikube) for orchestration
 
-- Visualizations using Python (Matplotlib)
+---
 
-## 🛠 Tech Stack
-- MySQL (Data Source)
-- Python (Analytics + Charting)
-- GitHub CLI (Project Management)
+## 🧱 Project Structure
 
-## 📁 Structure
-- `sql/`: SQL queries and schema files
-- `visuals/`: Screenshots and generated charts
-- `docs/`: Documentation, notes, and flowcharts
+```
+tourism-app/
+├── backend/                # Flask API
+│   ├── app.py
+│   ├── Dockerfile
+├── frontend/               # React dashboard
+│   ├── src/
+│   ├── Dockerfile
+├── k8s/                    # Kubernetes YAMLs
+│   ├── backend-deployment.yaml
+│   ├── backend-service.yaml
+│   ├── frontend-deployment.yaml
+│   ├── frontend-service.yaml
+├── .gitignore
+└── README.md
+```
 
-## 🚀 Goal
-To provide real-time, actionable insights for tour operators and local tourism businesses.
+---
 
-## 🔗 Author
-**Hermes Colina**  
-[GitHub](https://github.com/hermescolina) | [LinkedIn](https://www.linkedin.com/in/hermes-colina)
+## 🚀 Getting Started
 
-![Most Booked Tours](visuals/most_booked_tours.png)
-![Average Guests Per Tour](visuals/avg_guests_per_tour.png)
+### 1. Build images inside Minikube:
 
-#### 💰 Revenue Per Tour
-![Revenue Per Tour](visuals/revenue_per_tour.png)
+```bash
+eval $(minikube docker-env)
 
-#### 📈 Peak Booking Periods
-![Peak Booking Periods](visuals/peak_booking_periods.png)
+# Build backend
+cd backend
+docker build -t flask-backend .
 
-#### 🔄 User Engagement Over Time
-![User Engagement Over Time](visuals/user_engagement_over_time.png)
+# Build frontend
+cd ../frontend
+docker build -t react-frontend .
+```
+
+---
+
+### 2. Deploy to Kubernetes
+
+```bash
+cd ../k8s
+kubectl apply -f .
+```
+
+---
+
+### 3. Access the app
+
+```bash
+minikube service react-frontend --url
+```
+
+To test the API:
+
+```bash
+minikube service flask-backend --url
+```
+
+---
+
+## 📡 API Endpoint
+
+```
+GET /api/data
+```
+
+Returns:
+
+```json
+{
+  "labels": ["Mon", "Tue", "Wed", "Thu", "Fri"],
+  "values": [45, 78, 23, 90, 33]
+}
+```
+
+---
+
+## ✅ Next Steps
+
+- Set up Ingress for clean URLs
+- Add HTTPS with certs
+- Connect a real database
+- Deploy to EC2 or GKE
+- Add GitHub Actions CI/CD
+
+---
+
+## 👨‍💻 Maintainer
+
+Hermes Colina  
+[LinkedIn](https://www.linkedin.com/in/hermes-colina/)  
+[GitHub](https://github.com/hermescolina)
