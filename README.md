@@ -29,3 +29,11 @@ To provide real-time, actionable insights for tour operators and local tourism b
 ![Most Booked Tours](visuals/most_booked_tours.png)
 ![Average Guests Per Tour](visuals/avg_guests_per_tour.png)
 
+#### 💰 Revenue Per Tour
+![Revenue Per Tour](visuals/revenue_per_tour.png)
+
+#### 📈 Peak Booking Periods
+![Peak Booking Periods](visuals/peak_booking_periods.png)
+
+#### 🔄 User Engagement Over Time
+![User Engagement Over Time](visuals/user_engagement_over_time.png)
