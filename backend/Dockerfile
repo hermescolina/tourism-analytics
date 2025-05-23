@@ -1,10 +1,9 @@
-FROM node:18-alpine
+FROM python:3.10-slim
 
 WORKDIR /app
-
-COPY package*.json ./
-RUN npm install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+CMD ["python", "app.py"]
 
-CMD ["npm", "start"]

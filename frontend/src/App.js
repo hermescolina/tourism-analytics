@@ -1,25 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import { Line } from 'react-chartjs-2';
+import 'chart.js/auto';
 
 function App() {
+  const [chartData, setChartData] = useState({ labels: [], datasets: [] });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/data');
+        const data = await res.json();
+
+        setChartData({
+          labels: data.labels,
+          datasets: [
+            {
+              label: 'Live Data',
+              data: data.values,
+              borderColor: 'rgb(75, 192, 192)',
+              tension: 0.3
+            }
+          ]
+        });
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      }
+    };
+
+    fetchData(); // fetch initially
+    const interval = setInterval(fetchData, 5000); // auto-refresh every 5 sec
+    return () => clearInterval(interval);
+  }, []);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{ width: '600px', margin: '50px auto' }}>
+      <h2>📈 Live Chart Dashboard</h2>
+      <Line data={chartData} />
     </div>
   );
 }
 
 export default App;
+
