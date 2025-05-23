@@ -27,3 +27,5 @@ To provide real-time, actionable insights for tour operators and local tourism b
 [GitHub](https://github.com/hermescolina) | [LinkedIn](https://www.linkedin.com/in/hermes-colina)
 
 ![Most Booked Tours](visuals/most_booked_tours.png)
+![Average Guests Per Tour](visuals/avg_guests_per_tour.png)
+
