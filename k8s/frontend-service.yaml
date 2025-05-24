@@ -5,8 +5,10 @@ metadata:
 spec:
   selector:
     app: react-frontend
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
   type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 31091  # Fixed NodePort
+

@@ -11,7 +11,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:40489/api/data');
+        const res = await fetch('http://127.0.0.1:5000/api/data');
         const data = await res.json();
 
         setChartData({

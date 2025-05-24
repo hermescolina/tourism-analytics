@@ -5,8 +5,10 @@ metadata:
 spec:
   selector:
     app: flask-backend
+  type: NodePort  # <-- Important: expose via a fixed port
   ports:
-  - protocol: TCP
-    port: 5000
-    targetPort: 5000
-  type: ClusterIP
+    - protocol: TCP
+      port: 5000
+      targetPort: 5000
+      nodePort: 31092  # <-- Pick a port between 30000–32767
+
