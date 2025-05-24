@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
 
+console.log("App component mounted");
+
+
 function App() {
   const [chartData, setChartData] = useState({ labels: [], datasets: [] });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/data');
+        const res = await fetch('http://127.0.0.1:40489/api/data');
         const data = await res.json();
 
         setChartData({
@@ -34,11 +37,12 @@ function App() {
 
 
   return (
-    <div style={{ width: '600px', margin: '50px auto' }}>
+    <div style={{ width: '600px', margin: '50px auto', border: '1px solid red' }}>
       <h2>📈 Live Chart Dashboard</h2>
       <Line data={chartData} />
     </div>
   );
+
 }
 
 export default App;

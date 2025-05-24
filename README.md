@@ -98,6 +98,11 @@ Returns:
 
 ---
 
+## 📊 Live Chart Demo
+
+![Live Chart Demo](livechart.gif)
+
+
 ## 👨‍💻 Maintainer
 
 Hermes Colina  
