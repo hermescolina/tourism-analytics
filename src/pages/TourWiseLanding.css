@@ -1,0 +1,37 @@
+.tourwise-landing {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #1f2937;
+}
+
+.section-featured,
+.section-tips {
+    padding: 3rem 1.5rem;
+}
+
+.section-tips {
+    background-color: #f3f4f6;
+    padding-left: 16rem;
+    /* Push away from sidebar (adjust as needed) */
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.tips-grid {
+    max-width: 960px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .tips-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
