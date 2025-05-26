@@ -1,0 +1,4 @@
+node_modules
+.env
+git-filter-repo/
+minikube-linux-amd64
