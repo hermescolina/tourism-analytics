@@ -1,83 +1,75 @@
-# 📈 Live Dashboard: React + Flask + Kubernetes
+# 🌍 Tourism Analytics Dashboard – TourWise
 
-A real-time data visualization app using:
+**TourWise** is an interactive tourism analytics platform built with React and Flask, now with full booking navigation and hosted on GitHub Pages!
 
-- ⚛️ React (Chart.js) frontend
-- 🐍 Flask API backend
-- 🐳 Docker for containerization
-- ☸️ Kubernetes (Minikube) for orchestration
+🔗 **Live Site:** [https://hermescolina.github.io/tourism-analytics/](https://hermescolina.github.io/tourism-analytics/)
 
 ---
 
 ## 🧱 Project Structure
 
 ```
-tourism-app/
-├── backend/                # Flask API
-│   ├── app.py
-│   ├── Dockerfile
-├── frontend/               # React dashboard
-│   ├── src/
-│   ├── Dockerfile
-├── k8s/                    # Kubernetes YAMLs
-│   ├── backend-deployment.yaml
-│   ├── backend-service.yaml
-│   ├── frontend-deployment.yaml
-│   ├── frontend-service.yaml
-├── .gitignore
-└── README.md
+tourism-analytics/
+├── backend/                # Flask backend (legacy)
+├── backend-node/           # Node.js backend (current)
+├── docs/                   # Diagrams and supporting documentation
+├── frontend/               # React + Vite application
+│   ├── dist/               # Built static site
+│   ├── public/             # Static assets (images, logo, etc.)
+│   └── src/                
+│       ├── assets/         # Icons, backgrounds, and local images
+│       ├── components/     # Reusable React components
+│       └── pages/          # Tour pages and landing screens
+├── frontend.bak02/         # Backup of earlier frontend iteration
+├── k8s/                    # Kubernetes deployment configs
+├── docker-compose.yml      # Docker multi-service setup
+├── start.sh                # Launcher script for services
+├── README.md               # Project overview and instructions
 ```
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Build images inside Minikube:
+### 🔧 Local Setup with Minikube
 
 ```bash
+# Set Docker to Minikube's environment
 eval $(minikube docker-env)
 
-# Build backend
-cd backend
-docker build -t flask-backend .
+# Build backend (Node.js)
+cd backend-node
+docker build -t node-backend .
 
-# Build frontend
+# Build frontend (Vite + React)
 cd ../frontend
 docker build -t react-frontend .
-```
 
----
-
-### 2. Deploy to Kubernetes
-
-```bash
+# Deploy both
 cd ../k8s
 kubectl apply -f .
-```
 
----
-
-### 3. Access the app
-
-```bash
+# Access frontend
 minikube service react-frontend --url
 ```
 
-To test the API:
+---
 
-```bash
-minikube service flask-backend --url
-```
+## ✨ Features
+
+- ✅ Fully responsive UI built with React + Vite
+- ✅ Live chart visualization using Chart.js
+- ✅ Search and filter tours by keyword
+- ✅ Clickable destination cards with dynamic routing
+- ✅ "Book Now" buttons open a new tab with a full listing
+- ✅ Hosted on GitHub Pages
+- ✅ Dockerized and Kubernetes-ready
 
 ---
 
-## 📡 API Endpoint
+## 📊 API Sample
 
-```
-GET /api/data
-```
-
-Returns:
+**GET** `/api/data` returns:
 
 ```json
 {
@@ -88,23 +80,41 @@ Returns:
 
 ---
 
-## ✅ Next Steps
+## 🗺️ Pages Available
 
-- Set up Ingress for clean URLs
-- Add HTTPS with certs
-- Connect a real database
-- Deploy to EC2 or GKE
-- Add GitHub Actions CI/CD
+- `/` – Landing Page
+- `/el-nido` – El Nido Island Hopping
+- `/vigan` – Vigan Heritage Walk
+- `/chocolatehills` – Chocolate Hills Tour
+- `/siargao` – Siargao Surf Camp
+- `/tour-cards` – Complete listing of tours
 
 ---
 
-## 📊 Live Chart Demo
+## 🔄 Roadmap
+
+- [x] Add tour details and booking links
+- [x] Deploy live demo on GitHub Pages
+- [x] Move from Flask to Node backend
+- [ ] Add form-based booking engine
+- [ ] Integrate with payment gateway
+- [ ] CI/CD with GitHub Actions
+
+---
+
+## 🖥️ Demo Preview
 
 ![Live Chart Demo](livechart.gif)
 
+---
 
 ## 👨‍💻 Maintainer
 
-Hermes Colina  
-[LinkedIn](https://www.linkedin.com/in/hermes-colina/)  
-[GitHub](https://github.com/hermescolina)
+**Hermes Colina**
+
+- [GitHub](https://github.com/hermescolina)
+- [LinkedIn](https://www.linkedin.com/in/hermescolina)
+
+---
+
+> Star the repo ⭐ and contribute 🚀 to make TourWise even better!
