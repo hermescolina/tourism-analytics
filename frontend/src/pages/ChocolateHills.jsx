@@ -1,9 +1,19 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './ChocolateHills.css';
 
 const base = '/tourism-analytics';
 
 export default function ChocolateHills() {
+  // ✅ Set browser tab title on mount
+  useEffect(() => {
+    document.title = 'TourWise | Chocolate Hills Tour';
+  }, []);
+
+  // ✅ Handler to open TourCards in new tab
+  const handleBookNow = () => {
+    window.open(`${base}/tour-cards`, '_blank');
+  };
+
   return (
     <div className="chocolatehills-container">
       {/* Main Header */}
@@ -14,14 +24,19 @@ export default function ChocolateHills() {
         </div>
         <h1 className="browse-title-inline">Chocolate Hills Tour</h1>
         <div className="chocolatehills-actions">
-          <button className="action-button">Book Now</button>
+          {/* ✅ Updated: Book Now triggers new tab */}
+          <button className="action-button" onClick={handleBookNow}>Book Now</button>
           <button className="action-button">Share</button>
           <button className="action-button">Contact Guide</button>
         </div>
       </header>
 
       <div className="chocolatehills-hero" style={{ marginTop: '6rem' }}>
-        <img src={`${base}/images/chocolate_hills.jpg`} alt="Chocolate Hills Tour" className="chocolatehills-image" />
+        <img
+          src={`${base}/images/chocolate_hills.jpg`}
+          alt="Chocolate Hills Tour"
+          className="chocolatehills-image"
+        />
         <div className="chocolatehills-title">
           <h1>Chocolate Hills Adventure</h1>
           <p>Bohol, Philippines</p>
@@ -31,14 +46,16 @@ export default function ChocolateHills() {
       <section className="chocolatehills-section">
         <h2>About the Tour</h2>
         <p>
-          Explore the breathtaking landscape of over 1,200 cone-shaped hills in Bohol known as the Chocolate Hills. This countryside tour offers nature lovers and adventurers a chance to see one of the Philippines' most iconic natural wonders.
+          Explore the breathtaking landscape of over 1,200 cone-shaped hills in Bohol known as the Chocolate Hills.
+          This countryside tour offers nature lovers and adventurers a chance to see one of the Philippines' most iconic natural wonders.
         </p>
       </section>
 
       <section className="chocolatehills-section">
         <h2>History</h2>
         <p>
-          The Chocolate Hills are a geological formation created by uplifted coral deposits and rainwater erosion. During the dry season, the green grass covering the hills turns brown — hence the name "Chocolate Hills".
+          The Chocolate Hills are a geological formation created by uplifted coral deposits and rainwater erosion.
+          During the dry season, the green grass covering the hills turns brown — hence the name "Chocolate Hills".
         </p>
       </section>
 

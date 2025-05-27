@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './ElNido.css';
 
 const base = '/tourism-analytics';
 
 export default function ElNido() {
+    useEffect(() => {
+        document.title = 'TourWise | El Nido Island Hopping';
+    }, []);
+
+    const handleBookNow = () => {
+        window.open(`${base}/tour-cards`, '_blank');
+    };
+
     return (
         <div className="elnido-container">
             {/* Main Header */}
@@ -14,7 +22,7 @@ export default function ElNido() {
                 </div>
                 <h1 className="browse-title-inline">El Nido Tour</h1>
                 <div className="elnido-actions">
-                    <button className="action-button">Book Now</button>
+                    <button className="action-button" onClick={handleBookNow}>Book Now</button>
                     <button className="action-button">Share</button>
                     <button className="action-button">Contact Guide</button>
                 </div>
@@ -32,9 +40,7 @@ export default function ElNido() {
                 <h2>About the Tour</h2>
                 <p>
                     El Nido Island Hopping is one of the most popular activities in the Philippines, offering access
-                    to pristine beaches, dramatic limestone cliffs, hidden lagoons, and crystal-clear waters. This tour
-                    takes you on a journey through Bacuit Bay, where you'll visit famous spots like Big Lagoon, Small Lagoon,
-                    Secret Beach, and Shimizu Island.
+                    to pristine beaches, dramatic limestone cliffs, hidden lagoons, and crystal-clear waters...
                 </p>
             </section>
 
@@ -42,9 +48,7 @@ export default function ElNido() {
                 <h2>History</h2>
                 <p>
                     El Nido, named after the Spanish word for "The Nest," refers to the edible nests found in the limestone
-                    cliffs of the area. These nests are harvested and used for bird's nest soup, a delicacy in Chinese cuisine.
-                    Since the late 1970s, El Nido has evolved from a quiet fishing village to one of the most visited eco-tourism
-                    destinations in the world due to its stunning natural features and protected marine environment.
+                    cliffs of the area...
                 </p>
             </section>
 
