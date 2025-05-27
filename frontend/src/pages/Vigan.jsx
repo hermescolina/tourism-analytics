@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react'; // ✅ FIX: Added useEffect import
 import './Vigan.css';
 
 const base = '/tourism-analytics';
 
 export default function Vigan() {
+  useEffect(() => {
+    document.title = 'TourWise | Vigan Heritage Walk'; // ✅ FIX: Corrected title
+  }, []);
+
+  const handleBookNow = () => {
+    window.open(`${base}/tour-cards`, '_blank'); // ✅ FIX: Opens TourCards in new tab
+  };
+
   return (
     <div className="vigan-container">
       {/* Main Header */}
@@ -14,7 +22,8 @@ export default function Vigan() {
         </div>
         <h1 className="browse-title-inline">Vigan Tour</h1>
         <div className="vigan-actions">
-          <button className="action-button">Book Now</button>
+          {/* ✅ FIX: Connected button to handler */}
+          <button className="action-button" onClick={handleBookNow}>Book Now</button>
           <button className="action-button">Share</button>
           <button className="action-button">Contact Guide</button>
         </div>
@@ -31,14 +40,16 @@ export default function Vigan() {
       <section className="vigan-section">
         <h2>About the Tour</h2>
         <p>
-          Discover the charm of Spanish colonial architecture and cobblestone streets in Vigan — a UNESCO World Heritage City. This walking tour takes you through Calle Crisologo, ancestral houses, and cultural landmarks where history and tradition come alive.
+          Discover the charm of Spanish colonial architecture and cobblestone streets in Vigan — a UNESCO World Heritage City.
+          This walking tour takes you through Calle Crisologo, ancestral houses, and cultural landmarks where history and tradition come alive.
         </p>
       </section>
 
       <section className="vigan-section">
         <h2>History</h2>
         <p>
-          Vigan was established in the 16th century by Spanish colonizers and remains one of the best-preserved examples of a planned Spanish colonial town in Asia. Its unique fusion of Asian and European architecture reflects its rich trading history.
+          Vigan was established in the 16th century by Spanish colonizers and remains one of the best-preserved examples of a planned Spanish colonial town in Asia.
+          Its unique fusion of Asian and European architecture reflects its rich trading history.
         </p>
       </section>
 

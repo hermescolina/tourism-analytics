@@ -1,37 +1,43 @@
-import React, { useState } from 'react';
-import './BrowseTours.css'; // Make sure this file exists and is in the same folder
+import React, { useState, useEffect } from 'react';
+import './BrowseTours.css';
+
+const base = '/tourism-analytics';
 
 const tours = [
   {
     title: "El Nido Island Hopping",
     location: "Palawan",
     price: 2500,
-    image: "/images/el_nido.jpg",
+    image: `${base}/images/el_nido.jpg`,
     description: "Island adventure in Palawan"
   },
   {
     title: "Vigan Heritage Walk",
     location: "Ilocos Sur",
-    image: "/images/vigan_heritage_tour.png",
+    image: `${base}/images/vigan_heritage_tour.png`,
     description: "Cultural experience in Vigan"
   },
   {
     title: "Bohol Countryside Tour",
     location: "Bohol",
     price: 2100,
-    image: "/images/chocolate_hills.jpg",
+    image: `${base}/images/chocolate_hills.jpg`,
     description: "Explore nature in Bohol"
   },
   {
     title: "Siargao Surf Camp",
     location: "Siargao",
     price: 3000,
-    image: "/images/siargao_surf_camp.jpg",
+    image: `${base}/images/siargao_surf_camp.jpg`,
     description: "Catch waves in the surfing capital of the Philippines"
   }
 ];
 
 export default function BrowseTours() {
+  useEffect(() => {
+    document.title = 'TourWise | Browse All Tours';
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredTours = tours.filter(tour =>
@@ -43,7 +49,7 @@ export default function BrowseTours() {
     <div className="browse-container">
       <header className="browse-header">
         <div className="logo-section">
-          <img src="/images/tourwise.png" alt="TourWise Logo" className="logo-image" />
+          <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className="logo-image" />
           <span className="logo-text">TourWise</span>
         </div>
         <h1 className="browse-title-inline">Browse Tours</h1>
@@ -86,9 +92,10 @@ export default function BrowseTours() {
           <div className="tour-grid">
             {filteredTours.map((tour, index) => {
               const linkMap = {
-                "El Nido Island Hopping": "/el-nido",
-                "Vigan Heritage Walk": "/vigan",
-                "Bohol Countryside Tour": "/chocolatehills"
+                "El Nido Island Hopping": `${base}/el-nido`,
+                "Vigan Heritage Walk": `${base}/vigan`,
+                "Bohol Countryside Tour": `${base}/chocolatehills`,
+                "Siargao Surf Camp": `${base}/siargao` // ✅ Added
               };
 
               const tourLink = linkMap[tour.title];

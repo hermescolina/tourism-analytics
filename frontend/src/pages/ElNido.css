@@ -1,5 +1,4 @@
-/* ElNido.css */
-
+/* Container */
 .elnido-container {
     padding: 2rem;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -7,6 +6,60 @@
     color: #1f2937;
 }
 
+/* Browse Header */
+.browse-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+/* Logo Section */
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo-image {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #065f46;
+}
+
+/* Title */
+.browse-title-inline {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0;
+}
+
+/* Action Buttons */
+.elnido-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.action-button {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #333;
+    background-color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* Hero Section */
 .elnido-hero {
     display: flex;
     flex-direction: column;
@@ -34,6 +87,7 @@
     color: #4b5563;
 }
 
+/* Sections */
 .elnido-section {
     margin-bottom: 2rem;
     background: #fff;
@@ -58,9 +112,33 @@
     color: #374151;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
     .elnido-container {
         padding: 1rem;
+    }
+
+    .browse-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .logo-image {
+        height: 32px;
+    }
+
+    .logo-text {
+        font-size: 1rem;
+    }
+
+    .browse-title-inline {
+        font-size: 1.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .elnido-actions {
+        width: 100%;
+        justify-content: flex-start;
     }
 
     .elnido-title h1 {

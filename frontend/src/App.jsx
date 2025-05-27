@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TourWiseLanding from './pages/TourWiseLanding';
-import ElNido from './pages/ElNido'; // ✅ make sure this is imported
+import ElNido from './pages/ElNido';
 import Vigan from './pages/Vigan';
 import ChocolateHills from './pages/ChocolateHills';
-import Siargao from './pages/Siargao'; // Optional if you have it
+import Siargao from './pages/Siargao';
+import TourCards from './components/TourCards'; // ✅ NEW import
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/vigan" element={<Vigan />} />
         <Route path="/chocolatehills" element={<ChocolateHills />} />
         <Route path="/siargao" element={<Siargao />} />
+        <Route path="/tour-cards" element={<TourCards />} /> {/* ✅ NEW route */}
       </Routes>
     </Router>
   );
