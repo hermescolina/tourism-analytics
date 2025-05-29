@@ -102,26 +102,6 @@ minikube service react-frontend --url
 
 ---
 
-## 📊 Project Progress
-
-**Estimated Completion:** `15%`
-
-### ✅ Completed
-- Frontend live on GitHub Pages
-- Project structure and deployment scripts in place
-- Updated documentation
-
-### 🚧 In Progress
-- Backend API development (Flask & Node.js)
-- Integration of frontend with API
-- CI/CD pipeline setup
-
-### 🛠️ Next Steps
-- Implement user authentication
-- Add booking features
-- Launch analytics dashboard
-
-
 ## 🖥️ Demo Preview
 
 ![Live Chart Demo](livechart.gif)
