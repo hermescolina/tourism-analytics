@@ -1,47 +1,43 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './TourWiseLanding.css';
 
 const base = '/tourism-analytics';
 
-const tours = [
-    {
-        title: "El Nido Island Hopping",
-        location: "Palawan",
-        price: 2500,
-        image: `${base}/images/el_nido.jpg`,
-        description: "Island adventure in Palawan",
-        link: `${base}/el-nido`,
-    },
-    {
-        title: "Vigan Heritage Walk",
-        location: "Ilocos Sur",
-        price: 1800,
-        image: `${base}/images/vigan_heritage_tour.png`,
-        description: "Cultural experience in Vigan",
-        link: `${base}/vigan`,
-    },
-    {
-        title: "Chocolate Hills Tour",
-        location: "Bohol",
-        price: 2100,
-        image: `${base}/images/chocolate_hills.jpg`,
-        description: "Explore nature in Bohol",
-        link: `${base}/chocolatehills`,
-    },
-    {
-        title: "Siargao Surf Camp",
-        location: "Siargao",
-        price: 3000,
-        image: `${base}/images/siargao_surf_camp.jpg`,
-        description: "Catch waves in the surfing capital of the Philippines",
-        link: `${base}/siargao`,
-    }
-];
+// ✅ Move this OUTSIDE the JSX
+const sanitizeImagePath = (path) => {
+    if (!path) return '';
+    return path.startsWith('/') ? path : `/${path}`;
+};
 
 export default function TourWiseLanding() {
+    const [tours, setTours] = useState([]);
     useEffect(() => {
-        document.title = 'TourWise | Explore the World';
+        fetch(`${base}/data/landing.json`)
+            .then(res => res.text())
+            .then(text => {
+                console.log('🚨 Raw landing.json:', text);
+                const json = JSON.parse(text);
+                console.log('✅ Parsed topTours:', json.topTours);
+                setTours(json.topTours || []);
+            })
+            .catch(err => console.error('❌ Failed to load landing.json:', err));
     }, []);
+
+    // useEffect(() => {
+    //     document.title = 'TourWise | Explore the World';
+
+    //     fetch(`${base}/data/landing.json`)
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             console.log('✅ Loaded topTours from landing.json:', data.topTours);
+    //             setTours(data.topTours || []);
+    //         })
+    //         .catch(err => console.error('❌ Failed to load landing.json:', err));
+    // }, []);
+
+    if (!tours.length) {
+        return <p>Loading tours or no tours available...</p>;
+    }
 
     const handleBookNow = () => {
         window.open(`${base}/tour-cards`, '_blank');
@@ -65,16 +61,23 @@ export default function TourWiseLanding() {
                 <div className="tour-cards">
                     {tours.map((tour, index) => (
                         <a href={tour.link} className="tour-card" key={index}>
-                            <img src={tour.image} alt={tour.title} className="tour-image" />
+                            <img
+                                src={`${base}${sanitizeImagePath(tour.image)}`}
+                                alt={tour.title}
+                                className="tour-image"
+                            />
                             <div className="tour-info">
                                 <h3>{tour.title}</h3>
-                                <p className="location">{tour.location}</p>
-                                <p className="description">{tour.description}</p>
-                                <p className="price">₱{tour.price.toLocaleString()}</p>
+
+                                {tour.location && <p className="location">{tour.location}</p>}
+                                {tour.description && <p className="description">{tour.description}</p>}
+
+                                <p className="price">₱{tour.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                             </div>
                         </a>
                     ))}
                 </div>
+
             </section>
 
             {/* Travel Tips Section */}
