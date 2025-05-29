@@ -1,4 +1,6 @@
-/* Hero Section */
+/* ------------------------------
+   Hero Section
+---------------------------------*/
 .hero {
     background:
         linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)),
@@ -15,12 +17,42 @@
     /* fallback */
 }
 
+.hero-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.btn-primary {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #059669;
+}
+
+/* ------------------------------
+   Global Base
+---------------------------------*/
 .tourwise-landing {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #1f2937;
 }
 
-/* Section Layout */
+/* ------------------------------
+   Section Layout
+---------------------------------*/
 .section-featured,
 .section-tips {
     padding: 3rem 1.5rem;
@@ -33,7 +65,7 @@
     margin-bottom: 1.5rem;
 }
 
-/* Prevent overflow on small screens */
+/* Responsive padding on tips */
 @media (max-width: 768px) {
     .section-tips {
         padding-left: 1.5rem;
@@ -46,7 +78,9 @@
     }
 }
 
-/* Cards Layout */
+/* ------------------------------
+   Cards Layout
+---------------------------------*/
 .tour-cards {
     display: flex;
     flex-wrap: wrap;
@@ -56,6 +90,8 @@
 }
 
 .tour-card {
+    display: flex;
+    flex-direction: column;
     background-color: #fff;
     border-radius: 10px;
     overflow: hidden;
@@ -66,21 +102,26 @@
     max-width: 280px;
     min-width: 250px;
     flex: 1 1 260px;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    user-select: none;
 }
 
 .tour-card:hover {
-    transform: scale(1.02);
+    transform: scale(1.03);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .tour-image {
     width: 100%;
     height: 180px;
     object-fit: cover;
+    display: block;
 }
 
 .tour-info {
     padding: 1rem;
+    /* 🔧 FIXED: removed pointer-events: none; */
 }
 
 .tour-info h3 {
@@ -89,15 +130,15 @@
     color: #065f46;
 }
 
-.tour-info .location {
-    font-weight: 500;
-    color: #4b5563;
-}
-
 .tour-info .description {
     font-size: 0.95rem;
     color: #6b7280;
     margin: 0.5rem 0;
+}
+
+.tour-info .location {
+    font-weight: 500;
+    color: #4b5563;
 }
 
 .tour-info .price {
@@ -105,7 +146,9 @@
     color: #111827;
 }
 
-/* Tips Section Grid */
+/* ------------------------------
+   Tips Section
+---------------------------------*/
 .tips-grid {
     max-width: 960px;
     margin: 0 auto;

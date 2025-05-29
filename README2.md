@@ -13,7 +13,6 @@ tourism-analytics/
 ├── backend/                # Flask backend (legacy)
 ├── backend-node/           # Node.js backend (current)
 ├── docs/                   # Diagrams and supporting documentation
-│   └── tourwise-dynamic-pages-setup.md  # Dynamic subpage documentation
 ├── frontend/               # React + Vite application
 │   ├── dist/               # Built static site
 │   ├── public/             # Static assets (images, logo, etc.)
@@ -58,14 +57,13 @@ minikube service react-frontend --url
 
 ## ✨ Features
 
-* ✅ Fully responsive UI built with React + Vite
-* ✅ Live chart visualization using Chart.js
-* ✅ Search and filter tours by keyword
-* ✅ Clickable destination cards with dynamic routing
-* ✅ "Book Now" buttons open a new tab with a full listing
-* ✅ Hosted on GitHub Pages
-* ✅ Dockerized and Kubernetes-ready
-* ✅ Dynamic subpages using reusable templates and query string routing
+- ✅ Fully responsive UI built with React + Vite
+- ✅ Live chart visualization using Chart.js
+- ✅ Search and filter tours by keyword
+- ✅ Clickable destination cards with dynamic routing
+- ✅ "Book Now" buttons open a new tab with a full listing
+- ✅ Hosted on GitHub Pages
+- ✅ Dockerized and Kubernetes-ready
 
 ---
 
@@ -84,25 +82,23 @@ minikube service react-frontend --url
 
 ## 🗺️ Pages Available
 
-* `/` – Landing Page
-* `/el-nido` – El Nido Island Hopping
-* `/vigan` – Vigan Heritage Walk
-* `/chocolatehills` – Chocolate Hills Tour
-* `/siargao` – Siargao Surf Camp
-* `/tour-cards` – Complete listing of tours
-* `/tour?title=Boracay Beach Escape` – Dynamic tour detail page (template-based)
+- `/` – Landing Page
+- `/el-nido` – El Nido Island Hopping
+- `/vigan` – Vigan Heritage Walk
+- `/chocolatehills` – Chocolate Hills Tour
+- `/siargao` – Siargao Surf Camp
+- `/tour-cards` – Complete listing of tours
 
 ---
 
 ## 🔄 Roadmap
 
-* [x] Add tour details and booking links
-* [x] Deploy live demo on GitHub Pages
-* [x] Move from Flask to Node backend
-* [x] Document dynamic page strategy in `/docs`
-* [ ] Add form-based booking engine
-* [ ] Integrate with payment gateway
-* [ ] CI/CD with GitHub Actions
+- [x] Add tour details and booking links
+- [x] Deploy live demo on GitHub Pages
+- [x] Move from Flask to Node backend
+- [ ] Add form-based booking engine
+- [ ] Integrate with payment gateway
+- [ ] CI/CD with GitHub Actions
 
 ---
 
@@ -111,24 +107,20 @@ minikube service react-frontend --url
 **Estimated Completion:** `15%`
 
 ### ✅ Completed
-
-* Frontend live on GitHub Pages
-* Project structure and deployment scripts in place
-* Updated documentation
-* Implemented dynamic routing for subpages using `TourDetail.jsx`
+- Frontend live on GitHub Pages
+- Project structure and deployment scripts in place
+- Updated documentation
 
 ### 🚧 In Progress
-
-* Backend API development (Flask & Node.js)
-* Integration of frontend with API
-* CI/CD pipeline setup
+- Backend API development (Flask & Node.js)
+- Integration of frontend with API
+- CI/CD pipeline setup
 
 ### 🛠️ Next Steps
+- Implement user authentication
+- Add booking features
+- Launch analytics dashboard
 
-* Implement user authentication
-* Add booking features
-* Launch analytics dashboard
-* Add and connect additional dynamic templates (Vendor, Booking, Analytics)
 
 ## 🖥️ Demo Preview
 
@@ -140,10 +132,9 @@ minikube service react-frontend --url
 
 **Hermes Colina**
 
-* [GitHub](https://github.com/hermescolina)
-* [LinkedIn](https://www.linkedin.com/in/hermescolina)
+- [GitHub](https://github.com/hermescolina)
+- [LinkedIn](https://www.linkedin.com/in/hermescolina)
 
 ---
 
 > Star the repo ⭐ and contribute 🚀 to make TourWise even better!
-
