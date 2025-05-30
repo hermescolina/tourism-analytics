@@ -1,21 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TourWiseLanding from './pages/TourWiseLanding';
-import ElNido from './pages/ElNido';
-import Vigan from './pages/Vigan';
-import ChocolateHills from './pages/ChocolateHills';
-import Siargao from './pages/Siargao';
-import TourCards from './components/TourCards'; // ✅ NEW import
+import TourCards from './components/TourCards';
+import TourPage from './pages/TourPage'; // ✅ Use generic, dynamic page
 
 export default function App() {
   return (
     <Router basename="/tourism-analytics">
       <Routes>
+        {/* ✅ Home landing page */}
         <Route path="/" element={<TourWiseLanding />} />
-        <Route path="/el-nido" element={<ElNido />} />
-        <Route path="/vigan" element={<Vigan />} />
-        <Route path="/chocolatehills" element={<ChocolateHills />} />
-        <Route path="/siargao" element={<Siargao />} />
-        <Route path="/tour-cards" element={<TourCards />} /> {/* ✅ NEW route */}
+
+        {/* ✅ Dynamic route for individual tours */}
+        <Route path="/tour/:slug" element={<TourPage />} />
+
+        {/* ✅ Static route for tour cards */}
+        <Route path="/tour-cards" element={<TourCards />} />
       </Routes>
     </Router>
   );

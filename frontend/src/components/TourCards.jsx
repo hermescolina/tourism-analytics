@@ -1,50 +1,64 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import './BrowseTours.css';
+import './TourCards.css';
 
 const base = '/tourism-analytics';
 
-const tours = [
-  {
-    title: "El Nido Island Hopping",
-    location: "Palawan",
-    price: 2500,
-    image: `${base}/images/el_nido.jpg`,
-    description: "Island adventure in Palawan"
-  },
-  {
-    title: "Vigan Heritage Walk",
-    location: "Ilocos Sur",
-    price: 1800,
-    image: `${base}/images/vigan_heritage_tour.png`,
-    description: "Cultural experience in Vigan"
-  },
-  {
-    title: "Bohol Countryside Tour",
-    location: "Bohol",
-    price: 2100,
-    image: `${base}/images/chocolate_hills.jpg`,
-    description: "Explore nature in Bohol"
-  },
-  {
-    title: "Siargao Surf Camp",
-    location: "Siargao",
-    price: 3000,
-    image: `${base}/images/siargao_surf_camp.jpg`,
-    description: "Catch waves in the surfing capital of the Philippines"
-  }
-];
-
 export default function BrowseTours() {
+  const navigate = useNavigate();
+  const [tours, setTours] = useState([]);
+  const [minPrice, setMinPrice] = useState(1000);
+  const [maxPrice, setMaxPrice] = useState(100000);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+
+  const safeMinPrice = Number(minPrice) || 0;
+  const safeMaxPrice = Number(maxPrice) || 999999;
+
   useEffect(() => {
-    document.title = 'TourWise | Browse All Tours';
+    fetch('http://localhost:3001/api/landing-data')
+      .then(async res => {
+        const text = await res.text();
+        console.log("📦 Raw response text from API:", text);
+
+        try {
+          const data = JSON.parse(text);
+          console.log("✅ Parsed JSON response:", data);
+          setTours(data.topTours || []);
+        } catch (jsonErr) {
+          console.error("❌ JSON parse error:", jsonErr);
+        }
+      })
+      .catch(err => {
+        console.error("❌ Fetch failed:", err);
+      });
   }, []);
 
-  const [searchTerm, setSearchTerm] = useState('');
+  const handleCardClick = (tour) => {
+    if (tour.slug) {
+      navigate(`/tour/${tour.slug}`);
+      console.log(`🟢 Navigating to /tour/${tour.slug}`);
+    } else {
+      console.warn('⚠️ Missing slug for tour:', tour);
+    }
+  };
 
-  const filteredTours = tours.filter(tour =>
-    tour.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    tour.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const normalize = str => str.toLowerCase().replace(/\s+/g, '');
+
+  const filteredTours = tours.filter(tour => {
+    const searchNormalized = normalize(searchTerm);
+    const locationFilterNormalized = normalize(locationFilter);
+    const titleNormalized = normalize(tour.title || '');
+    const descNormalized = normalize(tour.description || '');
+    const locationNormalized = normalize(tour.location || '');
+    const priceValue = Number(tour.price);
+
+    const matchesSearch = titleNormalized.startsWith(searchNormalized);
+    const matchesLocation = locationNormalized.startsWith(locationFilterNormalized);
+    const matchesPrice = priceValue >= safeMinPrice && priceValue <= safeMaxPrice;
+
+    return matchesSearch && matchesLocation && matchesPrice;
+  });
 
   return (
     <div className="browse-container">
@@ -61,76 +75,94 @@ export default function BrowseTours() {
             className="search-bar"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onFocus={() => setLocationFilter('')}
           />
         </div>
       </header>
 
       <div className="browse-wrapper">
+        <aside className="filter-panel">
+          <h2 className="filter-title">Filters</h2>
+
+          <div className="filter-group">
+            <label className="filter-label">Location</label>
+            <input
+              type="text"
+              className="filter-input"
+              placeholder="Enter location"
+              value={locationFilter}
+              onChange={(e) => setLocationFilter(e.target.value)}
+              onFocus={() => setSearchTerm('')}
+            />
+          </div>
+
+          <div className="filter-group">
+            <label className="filter-label">Price Range</label>
+            <div className="price-range-inputs">
+              <input
+                type="number"
+                min="0"
+                value={minPrice}
+                onChange={(e) => setMinPrice(Number(e.target.value))}
+                className="price-input"
+                placeholder="Min"
+              />
+              <span>to</span>
+              <input
+                type="number"
+                min={minPrice}
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                className="price-input"
+                placeholder="Max"
+              />
+            </div>
+            <input
+              type="range"
+              min={minPrice}
+              max="100000"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              className="filter-range"
+            />
+            <p className="price-display">
+              ₱ {minPrice.toLocaleString()} – ₱ {maxPrice.toLocaleString()}
+            </p>
+          </div>
+
+          <div className="filter-group">
+            <label className="filter-label">Rating</label>
+            <div className="filter-stars">
+              {[1, 2, 3, 4, 5].map(star => (
+                <span key={star}>★</span>
+              ))}
+            </div>
+          </div>
+        </aside>
+
         <div className="browse-content">
-          <aside className="filter-panel">
-            <h2 className="filter-title">Filters</h2>
-
-            <div className="filter-group">
-              <label className="filter-label">Location</label>
-              <input type="text" className="filter-input" placeholder="Enter location" />
-            </div>
-
-            <div className="filter-group">
-              <label className="filter-label">Price Range</label>
-              <input type="range" min="1000" max="5000" className="filter-range" />
-            </div>
-
-            <div className="filter-group">
-              <label className="filter-label">Rating</label>
-              <div className="filter-stars">
-                {[1, 2, 3, 4, 5].map(star => (
-                  <span key={star}>★</span>
-                ))}
-              </div>
-            </div>
-          </aside>
-
           <div className="tour-grid">
-            {filteredTours.map((tour, index) => {
-              const linkMap = {
-                "El Nido Island Hopping": `${base}/el-nido`,
-                "Vigan Heritage Walk": `${base}/vigan`,
-                "Bohol Countryside Tour": `${base}/chocolatehills`,
-                "Siargao Surf Camp": `${base}/siargao` // ✅ Added
-              };
-
-              const tourLink = linkMap[tour.title];
-
-              return tourLink ? (
-                <a
-                  key={index}
-                  href={tourLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="tour-card"
-                >
-                  <div className="tour-card-image-wrapper">
-                    <img src={tour.image} alt={tour.title} className="tour-card-image" />
-                  </div>
-                  <div className="tour-card-content">
-                    <h3 className="tour-title">{tour.title}</h3>
-                    <p className="tour-description">{tour.description}</p>
-                    <p className="tour-price">₱ {tour.price?.toLocaleString()}</p>
-                  </div>
-                </a>
-              ) : (
-                <div key={index} className="tour-card">
-                  <div className="tour-card-image-wrapper">
-                    <img src={tour.image} alt={tour.title} className="tour-card-image" />
-                  </div>
-                  <div className="tour-card-content">
-                    <h3 className="tour-title">{tour.title}</h3>
-                    <p className="tour-description">{tour.description}</p>
-                    <p className="tour-price">₱ {tour.price?.toLocaleString()}</p>
-                  </div>
+            {filteredTours.map((tour, index) => (
+              <div
+                key={index}
+                className="tour-card"
+                onClick={() => handleCardClick(tour)}
+              >
+                <img
+                  src={`${base}${tour.image}`}
+                  alt={tour.title}
+                  className="tour-card-image"
+                />
+                <div className="tour-card-details">
+                  <h3 className="tour-title">{tour.title}</h3>
+                  <p className="tour-description">{tour.description}</p>
+                  <p className="tour-price">₱ {Number(tour.price).toLocaleString()}</p>
                 </div>
-              );
-            })}
+              </div>
+            ))}
+            {filteredTours.length === 0 && (
+              <p className="no-results-message">No matching tours found.</p>
+            )}
           </div>
         </div>
       </div>

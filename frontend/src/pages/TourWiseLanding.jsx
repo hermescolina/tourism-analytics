@@ -1,9 +1,10 @@
+import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import './TourWiseLanding.css';
 
 const base = '/tourism-analytics';
+const apiUrl = 'http://localhost:3001/api/landing-data';
 
-// ✅ Move this OUTSIDE the JSX
 const sanitizeImagePath = (path) => {
     if (!path) return '';
     return path.startsWith('/') ? path : `/${path}`;
@@ -11,36 +12,32 @@ const sanitizeImagePath = (path) => {
 
 export default function TourWiseLanding() {
     const [tours, setTours] = useState([]);
+    const navigate = useNavigate(); // ✅ this must be inside the component
+
     useEffect(() => {
-        fetch(`${base}/data/landing.json`)
-            .then(res => res.text())
-            .then(text => {
-                console.log('🚨 Raw landing.json:', text);
-                const json = JSON.parse(text);
-                console.log('✅ Parsed topTours:', json.topTours);
-                setTours(json.topTours || []);
+        fetch(apiUrl)
+            .then(res => res.json())
+            .then(data => {
+                setTours(data.topTours || []);
             })
-            .catch(err => console.error('❌ Failed to load landing.json:', err));
+            .catch(err => console.error('❌ Failed to fetch from API:', err));
     }, []);
 
-    // useEffect(() => {
-    //     document.title = 'TourWise | Explore the World';
 
-    //     fetch(`${base}/data/landing.json`)
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             console.log('✅ Loaded topTours from landing.json:', data.topTours);
-    //             setTours(data.topTours || []);
-    //         })
-    //         .catch(err => console.error('❌ Failed to load landing.json:', err));
-    // }, []);
 
     if (!tours.length) {
         return <p>Loading tours or no tours available...</p>;
     }
 
     const handleBookNow = () => {
+        console.log('🟢 Book Now button clicked');
         window.open(`${base}/tour-cards`, '_blank');
+    };
+
+    const handleCardClick = (title) => {
+        console.log(`🟢 Tour card clicked: ${title}`);
+        const slug = title.toLowerCase().replace(/\s+/g, '-'); // convert title to URL-friendly slug
+        navigate(`/tour/${slug}`); // ✅ navigate to a dynamic route like /tour/el-nido-island-hopping
     };
 
     return (
@@ -60,7 +57,14 @@ export default function TourWiseLanding() {
 
                 <div className="tour-cards">
                     {tours.map((tour, index) => (
-                        <a href={tour.link} className="tour-card" key={index}>
+                        <a
+                            href={tour.link}
+                            className="tour-card"
+                            key={index}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={() => handleCardClick(tour.title)}
+                        >
                             <img
                                 src={`${base}${sanitizeImagePath(tour.image)}`}
                                 alt={tour.title}
@@ -68,16 +72,21 @@ export default function TourWiseLanding() {
                             />
                             <div className="tour-info">
                                 <h3>{tour.title}</h3>
-
-                                {tour.location && <p className="location">{tour.location}</p>}
-                                {tour.description && <p className="description">{tour.description}</p>}
-
-                                <p className="price">₱{tour.price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                <p className="description">
+                                    {tour.description || 'No description available.'}
+                                </p>
+                                {tour.location && (
+                                    <p className="location">{tour.location}</p>
+                                )}
+                                <p className="price">
+                                    ₱{Number(tour.price).toLocaleString(undefined, {
+                                        minimumFractionDigits: 2,
+                                    })}
+                                </p>
                             </div>
                         </a>
                     ))}
                 </div>
-
             </section>
 
             {/* Travel Tips Section */}
