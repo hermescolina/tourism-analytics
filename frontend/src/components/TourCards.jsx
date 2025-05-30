@@ -4,8 +4,6 @@ import './TourCards.css';
 
 const base = '/tourism-analytics';
 
-
-
 export default function BrowseTours() {
   const navigate = useNavigate();
   const [tours, setTours] = useState([]);
@@ -16,7 +14,6 @@ export default function BrowseTours() {
 
   const safeMinPrice = Number(minPrice) || 0;
   const safeMaxPrice = Number(maxPrice) || 999999;
-
 
   useEffect(() => {
     fetch('http://localhost:3001/api/landing-data')
@@ -37,12 +34,13 @@ export default function BrowseTours() {
       });
   }, []);
 
-
-
-
   const handleCardClick = (tour) => {
-    navigate(tour.link); // assuming tour.link = "/el-nido"
-    console.log(`🟢 Navigating to tour title: ${tour.link}`);
+    if (tour.slug) {
+      navigate(`/tour/${tour.slug}`);
+      console.log(`🟢 Navigating to /tour/${tour.slug}`);
+    } else {
+      console.warn('⚠️ Missing slug for tour:', tour);
+    }
   };
 
   const normalize = str => str.toLowerCase().replace(/\s+/g, '');
@@ -55,18 +53,6 @@ export default function BrowseTours() {
     const locationNormalized = normalize(tour.location || '');
     const priceValue = Number(tour.price);
 
-    console.log({
-      title: tour.title,
-      location: tour.location,
-      price: tour.price,
-      normalized: {
-        titleNormalized,
-        locationNormalized,
-        searchNormalized,
-        locationFilterNormalized,
-      }
-    });
-
     const matchesSearch = titleNormalized.startsWith(searchNormalized);
     const matchesLocation = locationNormalized.startsWith(locationFilterNormalized);
     const matchesPrice = priceValue >= safeMinPrice && priceValue <= safeMaxPrice;
@@ -78,7 +64,7 @@ export default function BrowseTours() {
     <div className="browse-container">
       <header className="browse-header">
         <div className="logo-section">
-          <img src={`${base} / images / tourwise.png`} alt="TourWise Logo" className="logo-image" />
+          <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className="logo-image" />
           <span className="logo-text">TourWise</span>
         </div>
         <h1 className="browse-title-inline">Browse Tours</h1>
@@ -174,7 +160,6 @@ export default function BrowseTours() {
                 </div>
               </div>
             ))}
-
             {filteredTours.length === 0 && (
               <p className="no-results-message">No matching tours found.</p>
             )}

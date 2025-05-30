@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import TourWiseLanding from './pages/TourWiseLanding';
 import TourCards from './components/TourCards';
-import TourPage from './pages/ElNido'; // ✅ Dynamic route component 
+import TourPage from './pages/TourPage'; // ✅ Use generic, dynamic page
 
 export default function App() {
   return (
