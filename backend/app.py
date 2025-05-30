@@ -7,11 +7,13 @@ CORS(app)
 
 # Set up database connection once
 db = mysql.connector.connect(
-    host="localhost",
-    user="root",          # 🔁 Replace as needed
-    password="Asdf1234!", # 🔁 Replace as needed
-    database="tourism_app"
+    host="mysql1002.site4now.net",
+    user="ab9bb5_tourism",
+    password="Asdf1234!",
+    database="db_ab9bb5_tourism",
+    port=3306
 )
+
 
 # ✅ Route for landing data (with slug now included)
 @app.route('/api/landing-data')
