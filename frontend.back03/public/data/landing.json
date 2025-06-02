@@ -10,15 +10,6 @@
       "slug": "chocolate-hills-adventure"
     },
     {
-      "title": "El Nido Island Hopping",
-      "location": "Palawan",
-      "image": "/images/el_nido.jpg",
-      "price": 2000.0,
-      "rating": 0.0,
-      "views": 0,
-      "slug": "el-nido-island-hopping"
-    },
-    {
       "title": "Vigan City Tour",
       "location": "Ilocos Sur",
       "image": "/images/vigan_heritage_tour.png",
@@ -26,6 +17,15 @@
       "rating": 0.0,
       "views": 0,
       "slug": "vigan-city-tour"
+    },
+    {
+      "title": "El Nido Island Hopping",
+      "location": "Palawan",
+      "image": "/images/el_nido.jpg",
+      "price": 2000.0,
+      "rating": 0.0,
+      "views": 0,
+      "slug": "el-nido-island-hopping"
     }
   ]
 }

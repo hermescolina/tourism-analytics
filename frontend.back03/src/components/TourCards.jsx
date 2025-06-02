@@ -16,8 +16,8 @@ export default function BrowseTours() {
   const safeMaxPrice = Number(maxPrice) || 999999;
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/landing-data')
-      //fetch('https://tourism-analytics.onrender.com/api/landing-data')
+    //fetch('http://localhost:3001/api/landing-data')
+    fetch('https://tourism-analytics.onrender.com/api/landing-data')
       .then(async res => {
         const text = await res.text();
         console.log("📦 Raw response text from API:", text);

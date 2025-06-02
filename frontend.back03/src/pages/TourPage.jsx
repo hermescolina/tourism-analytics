@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useParams } from 'react-router-dom';
 import './TourPage.css';
 
 const base = '/tourism-analytics';
-const apiBase = 'http://localhost:3001';
-const urlBase = 'http://localhost:5173/tourism-analytics';
+//const apiBase = 'http://localhost:3001';
+const apiBase = 'https://tourism-analytics.onrender.com';
+
 
 export default function TourPage() {
     const { slug } = useParams();
@@ -31,21 +31,11 @@ export default function TourPage() {
     if (error) return <div className="tour-container">{error}</div>;
     if (!tour) return <div className="tour-container">Loading...</div>;
 
-    // ✅ Define imageUrl once tour is loaded
-    const imagePath = tour.image || '';
-    const imageUrl = imagePath.startsWith('/uploads/images/')
-        ? `${urlBase}${imagePath.replace('/uploads', '')}`
-        : `${apiBase}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
-
     return (
         <div className="tour-container">
             <header className="browse-header">
                 <div className="logo-section">
-                    <Link to="/">
-                        <img src={imageUrl} alt="TourWise" className="logo-image" />
-                    </Link>
-
-
+                    <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className="logo-image" />
                     <span className="logo-text">TourWise</span>
                 </div>
                 <h1 className="browse-title-inline">{tour.title}</h1>
@@ -57,7 +47,7 @@ export default function TourPage() {
             </header>
 
             <div className="tour-hero" style={{ marginTop: '6rem' }}>
-                <img src={imageUrl} alt={tour.title} className="tour-image" />
+                <img src={`${base}${tour.image}`} alt={tour.title} className="tour-image" />
                 <div className="tour-title">
                     <h1>{tour.title}</h1>
                     <p>{tour.location}</p>

@@ -3,41 +3,45 @@ import React, { useEffect, useState } from 'react';
 import './TourWiseLanding.css';
 
 const base = '/tourism-analytics';
-const apiUrl = 'http://localhost:3001/api/landing-data';
+const imageBase = 'http://localhost:3001';
 
-const sanitizeImagePath = (path) => {
+// 🔹 Resolver for static image in /public/images or /uploads
+const getStaticImageUrl = (path) => {
     if (!path) return '';
-    return path.startsWith('/') ? path : `/${path}`;
+
+    let cleaned = path.startsWith('/') ? path : `/${path}`;
+    if (cleaned.startsWith('/uploads/')) {
+        return `${imageBase}${cleaned}`;
+    } else {
+        return `${base}${cleaned}`;
+    }
 };
 
 export default function TourWiseLanding() {
     const [tours, setTours] = useState([]);
-    const navigate = useNavigate(); // ✅ this must be inside the component
+    const navigate = useNavigate();
 
     useEffect(() => {
-        fetch(apiUrl)
-            .then(res => res.json())
-            .then(data => {
-                setTours(data.topTours || []);
+        fetch('http://localhost:3001/api/landing-data')
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+                return res.json();
             })
-            .catch(err => console.error('❌ Failed to fetch from API:', err));
+            .then(data => {
+                console.log("✅ Fetched API data:", data);
+                setTours(data.topTours);
+            })
+            .catch(err => {
+                console.error('❌ Failed to fetch from API:', err);
+            });
     }, []);
-
-
 
     if (!tours.length) {
         return <p>Loading tours or no tours available...</p>;
     }
 
     const handleBookNow = () => {
-        console.log('🟢 Book Now button clicked');
         window.open(`${base}/tour-cards`, '_blank');
-    };
-
-    const handleCardClick = (title) => {
-        console.log(`🟢 Tour card clicked: ${title}`);
-        const slug = title.toLowerCase().replace(/\s+/g, '-'); // convert title to URL-friendly slug
-        navigate(`/tour/${slug}`); // ✅ navigate to a dynamic route like /tour/el-nido-island-hopping
     };
 
     return (
@@ -56,36 +60,41 @@ export default function TourWiseLanding() {
                 <h2 className="section-title">Top Destinations</h2>
 
                 <div className="tour-cards">
-                    {tours.map((tour, index) => (
-                        <a
-                            href={tour.link}
-                            className="tour-card"
-                            key={index}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() => handleCardClick(tour.title)}
-                        >
-                            <img
-                                src={`${base}${sanitizeImagePath(tour.image)}`}
-                                alt={tour.title}
-                                className="tour-image"
-                            />
-                            <div className="tour-info">
-                                <h3>{tour.title}</h3>
-                                <p className="description">
-                                    {tour.description || 'No description available.'}
-                                </p>
-                                {tour.location && (
-                                    <p className="location">{tour.location}</p>
-                                )}
-                                <p className="price">
-                                    ₱{Number(tour.price).toLocaleString(undefined, {
-                                        minimumFractionDigits: 2,
-                                    })}
-                                </p>
+                    {tours.map((tour, index) => {
+                        console.log(`🔍 Raw image from DB for "${tour.title}":`, tour.image);
+
+                        const imageUrl = getStaticImageUrl(tour.image);
+
+                        console.log(`📸 Final resolved image for "${tour.title}":`, imageUrl);
+
+                        return (
+                            <div
+                                className="tour-card"
+                                key={index}
+                                onClick={() => navigate(`/tour/${tour.slug}`)}
+                            >
+                                <img
+                                    src={imageUrl}
+                                    alt={tour.title}
+                                    className="tour-image"
+                                />
+                                <div className="tour-info">
+                                    <h3>{tour.title}</h3>
+                                    <p className="description">
+                                        {tour.description || 'No description available.'}
+                                    </p>
+                                    {tour.location && (
+                                        <p className="location">{tour.location}</p>
+                                    )}
+                                    <p className="price">
+                                        ₱{Number(tour.price).toLocaleString(undefined, {
+                                            minimumFractionDigits: 2,
+                                        })}
+                                    </p>
+                                </div>
                             </div>
-                        </a>
-                    ))}
+                        );
+                    })}
                 </div>
             </section>
 
