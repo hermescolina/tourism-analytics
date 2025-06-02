@@ -8,6 +8,7 @@ minikube-linux-amd64
 **/backup/
 **/*-bak*/
 **/*.bak/
+frontend.bak*
 
 # Ignore specific known backup directory
 frontend.bak02/
