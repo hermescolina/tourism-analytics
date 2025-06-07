@@ -1,40 +1,31 @@
 {
-  "lastUpdated": "2025-05-29T04:53:23.447Z",
   "topTours": [
     {
-      "title": "El Nido Island Hopping",
-      "location": null,
-      "image": "/images/el_nido.jpg",
-      "price": "2000.00",
+      "title": "Chocolate Hills Adventure",
+      "location": "Bohol",
+      "image": "/images/chocolate_hills.jpg",
+      "price": 1800.0,
+      "rating": 0.0,
       "views": 0,
-      "rating": 0
+      "slug": "chocolate-hills-adventure"
+    },
+    {
+      "title": "El Nido Island Hopping",
+      "location": "Palawan",
+      "image": "/images/el_nido.jpg",
+      "price": 2000.0,
+      "rating": 0.0,
+      "views": 0,
+      "slug": "el-nido-island-hopping"
     },
     {
       "title": "Vigan City Tour",
-      "location": null,
+      "location": "Ilocos Sur",
       "image": "/images/vigan_heritage_tour.png",
-      "price": "1200.00",
+      "price": 1200.0,
+      "rating": 0.0,
       "views": 0,
-      "rating": 0
-    },
-    {
-      "title": "Chocolate Hills Adventure",
-      "location": null,
-      "image": "/images/chocolate_hills.jpg",
-      "price": "1800.00",
-      "views": 0,
-      "rating": 0
-    },
-    {
-      "title": "Siargao Surf Camp",
-      "location": null,
-      "image": "/images/siargao_surf_camp.jpg",
-      "price": "2500.00",
-      "views": 0,
-      "rating": 0
+      "slug": "vigan-city-tour"
     }
-  ],
-  "topHotels": [],
-  "topCars": [],
-  "topInsights": []
+  ]
 }

@@ -17,6 +17,7 @@ export default function BrowseTours() {
 
   useEffect(() => {
     fetch('http://localhost:3001/api/landing-data')
+      //fetch('https://tourism-analytics.onrender.com/api/landing-data')
       .then(async res => {
         const text = await res.text();
         console.log("📦 Raw response text from API:", text);
@@ -149,14 +150,34 @@ export default function BrowseTours() {
                 onClick={() => handleCardClick(tour)}
               >
                 <img
-                  src={`${base}${tour.image}`}
+                  src={tour.image.includes('uploads')
+                    ? `http://localhost:3001/${tour.image}`
+                    : `${base}${tour.image}`}
                   alt={tour.title}
                   className="tour-card-image"
                 />
+
                 <div className="tour-card-details">
                   <h3 className="tour-title">{tour.title}</h3>
                   <p className="tour-description">{tour.description}</p>
                   <p className="tour-price">₱ {Number(tour.price).toLocaleString()}</p>
+                  <p className="tour-slots">🎟️ {tour.available_slots} slots available</p>
+                  <p className="tour-dates">
+
+
+                    📅 {new Date(tour.start_date).toLocaleDateString('en-PH', {
+                      weekday: 'short',
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    })} – {new Date(tour.end_date).toLocaleDateString('en-PH', {
+                      weekday: 'short',
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
+                  </p>
+
                 </div>
               </div>
             ))}

@@ -59,3 +59,44 @@ Reduce unnecessary network traffic by caching all static content (tour data and 
 | Booking request    | ✅ ~1KB POST    |
 | Total usage (after first load) | ✅ Minimal |
 
+
+## 🔁 Incremental Updates & Smart Caching (TourWise)
+
+To minimize bandwidth usage while keeping tour data fresh, TourWise implements a **partial update strategy**.
+
+Instead of re-downloading all data or assets on every visit, the app:
+- ✅ Loads from local cache by default
+- ✅ Periodically checks for updates using a lightweight `meta.json`
+- ✅ Downloads **only new or changed tours**
+- ✅ Re-downloads **only updated images**
+- ✅ Deletes locally cached tours if removed from the server
+
+---
+
+### 🧠 How It Works
+
+#### On First Visit:
+- Tour data is fetched and stored in `localStorage`
+- Tour images are downloaded and saved to `IndexedDB` as blobs
+- A `version` or `lastUpdated` value is also stored
+
+#### On Subsequent Visits:
+- Cached content is loaded instantly (for fast startup)
+- In the background, the app fetches `/data/meta.json`
+- If version is newer, it requests `/api/landing-diff?since=lastUpdated`
+- Only changed tours and images are downloaded
+
+---
+
+### 📦 Example Diff Format
+```json
+{
+  "new": [
+    { "slug": "new-tour", "title": "New Tour", "image": "/images/new.jpg" }
+  ],
+  "updated": [
+    { "slug": "bohol", "title": "Updated Bohol Tour", "image": "/images/bohol_new.jpg" }
+  ],
+  "deleted": ["old-tour-slug"]
+}
+
