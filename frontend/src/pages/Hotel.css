@@ -1,6 +1,6 @@
 .hotel-header {
     height: 100vh;
-    background-image: url('/images/PeninsulaBG.png');
+    /* background-image: url('/images/PeninsulaBG.png'); */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -164,11 +164,6 @@
     border-radius: 8px;
 }
 
-/* Section modifiers */
-/* .first-section {
-    margin-top: 500vh;
-    clear: both;
-} */
 
 .first-section {
     margin-top: 0;

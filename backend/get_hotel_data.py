@@ -3,7 +3,12 @@ from flask_cors import CORS
 import mysql.connector
 from dotenv import load_dotenv
 import os
+import logging
 from werkzeug.utils import secure_filename
+
+# ✅ Set up logging once globally
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # ✅ Load environment variables
 load_dotenv()
@@ -19,16 +24,84 @@ db_config = {
 app = Flask(__name__)
 CORS(app)
 
-# ✅ Configure upload folder
-UPLOAD_FOLDER = 'static/uploads'
+# ✅ Add new hotel
+@app.route('/api/hotel', methods=['POST'])
+def add_hotel():
+    data = request.get_json()
+    name = data.get('name')
+    slug = data.get('slug')
+    address = data.get('address', '')
+    city = data.get('city', '')
+    region = data.get('region', '')
+    country = data.get('country', '')
+    phone = data.get('phone', '')
+    email = data.get('email', '')
+    website = data.get('website', '')
+    opening_date = data.get('opening_date', None)
+    operator = data.get('operator', '')
+    owner = data.get('owner', '')
+    number_of_rooms = data.get('number_of_rooms', None)
+    number_of_suites = data.get('number_of_suites', None)
+    floors = data.get('floors', None)
+    description = data.get('description', '')
+
+    if not name or not slug:
+        return jsonify({"error": "Hotel name and slug are required"}), 400
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+
+        query = """
+            INSERT INTO hotels (
+                name, slug, address, city, region, country,
+                phone, email, website, opening_date,
+                operator, owner, number_of_rooms,
+                number_of_suites, floors, description
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        values = (
+            name, slug, address, city, region, country,
+            phone, email, website, opening_date,
+            operator, owner, number_of_rooms,
+            number_of_suites, floors, description
+        )
+
+        cursor.execute(query, values)
+        conn.commit()
+
+        return jsonify({
+            "hotel_id": cursor.lastrowid,
+            "name": name,
+            "slug": slug
+        }), 201
+
+    except mysql.connector.Error as err:
+        return jsonify({"error": str(err)}), 500
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+# # ✅ Configure upload folder
+# UPLOAD_FOLDER = 'uploads'
+# os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# ✅ Configure upload folder to match frontend's public path
+UPLOAD_FOLDER = os.path.abspath('../frontend/public/images')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 
 # ✅ Create per-request DB connection
 def get_conn():
     conn = mysql.connector.connect(**db_config)
-    print("🛠 Connected to:", db_config["host"], db_config["database"])
+    logger.info("🛠 Connected to: %s %s", db_config["host"], db_config["database"])
     return conn
+
 
 # ✅ Fetch a single row
 def fetch_one(query, params):
@@ -98,13 +171,14 @@ def get_or_update_hotel(slug):
 
         return jsonify({"message": "Hotel updated successfully"})
 
-# ✅ POST: Upload hotel image
+# # ✅ POST: Upload hotel image
 @app.route('/api/hotel/image', methods=['POST'])
 def upload_hotel_image():
     hotel_id = request.form.get('hotel_id')
     category = request.form.get('category')
     description = request.form.get('description')
     file = request.files.get('image')
+    is_background = request.form.get('is_background') == 'true'  # ✅ NEW LINE
 
     if not file or not hotel_id:
         return jsonify({"error": "Missing hotel_id or image file"}), 400
@@ -120,6 +194,14 @@ def upload_hotel_image():
             INSERT INTO hotel_images (hotel_id, filename, category, description)
             VALUES (%s, %s, %s, %s)
         """, (hotel_id, filename, category, description))
+
+        # ✅ Background image override logic
+        if is_background:
+            cursor.execute("""
+                UPDATE hotels SET background_image = %s
+                WHERE hotel_id = %s
+            """, (filename, hotel_id))
+
         conn.commit()
     except mysql.connector.IntegrityError as e:
         return jsonify({"error": "Image already exists for this hotel and category."}), 409
@@ -128,6 +210,36 @@ def upload_hotel_image():
         conn.close()
 
     return jsonify({"message": "Image uploaded successfully", "filename": filename}), 201
+
+# @app.route('/api/hotel/image', methods=['POST'])
+# def upload_hotel_image():
+#     hotel_id = request.form.get('hotel_id')
+#     category = request.form.get('category')
+#     description = request.form.get('description')
+#     file = request.files.get('image')
+
+#     if not file or not hotel_id:
+#         return jsonify({"error": "Missing hotel_id or image file"}), 400
+
+#     filename = secure_filename(file.filename)
+#     path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+#     file.save(path)
+
+#     conn = get_conn()
+#     cursor = conn.cursor()
+#     try:
+#         cursor.execute("""
+#             INSERT INTO hotel_images (hotel_id, filename, category, description)
+#             VALUES (%s, %s, %s, %s)
+#         """, (hotel_id, filename, category, description))
+#         conn.commit()
+#     except mysql.connector.IntegrityError as e:
+#         return jsonify({"error": "Image already exists for this hotel and category."}), 409
+#     finally:
+#         cursor.close()
+#         conn.close()
+
+#     return jsonify({"message": "Image uploaded successfully", "filename": filename}), 201
 
 # ✅ PATCH an image
 @app.route('/api/hotel/image/<filename>', methods=['PATCH'])
@@ -166,6 +278,21 @@ def delete_hotel_image(filename):
         return jsonify({"error": "Image not found"}), 404
 
     return jsonify({"message": "Image deleted successfully"}), 200
+
+@app.route('/api/hotels', methods=['GET'])
+def list_hotels():
+    try:
+        conn = get_conn()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT name, slug, city, country FROM hotels ORDER BY name ASC")
+        hotels = cursor.fetchall()
+        return jsonify(hotels)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
 
 # ✅ Run Flask app
 if __name__ == '__main__':

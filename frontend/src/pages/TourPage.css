@@ -1,3 +1,44 @@
+.history-entry {
+    overflow: hidden;
+    /* Ensures float is contained */
+    margin-bottom: 2rem;
+}
+
+/* Remove flex-based layout */
+.history-entry.left .history-image {
+    float: left;
+    margin-right: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.history-entry.right .history-image {
+    float: right;
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.history-image {
+    width: 350px;
+    height: auto;
+    border-radius: 10px;
+    object-fit: cover;
+    margin-top: 1.5rem;
+}
+
+/* Caption text wraps around the floated image */
+.history-caption {
+    line-height: 1.6;
+    text-align: justify;
+}
+
+.history-entry.left .history-image {
+    margin-left: 1rem;
+}
+
+.history-entry.right .history-image {
+    margin-right: 1rem;
+}
+
 /* Container */
 .tour-container {
     padding: 2rem;
