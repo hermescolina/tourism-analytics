@@ -2,9 +2,9 @@
 
 **TourWise** is an interactive tourism analytics platform built with React and Flask, now with full booking navigation and hosted on GitHub Pages!
 
-🔗 **Live Site:** [https://hermescolina.github.io/tourism-analytics/](https://app.tourwise.shop/tourism-analytics/)
+🔗 **Live Site:** [https://app.tourwise.shop/tourism-analytics/](https://app.tourwise.shop/tourism-analytics/)
 
-🔗 **Live Site:** [https://hermescolina.github.io/tourism-analytics/](https://app.tourwise.shop/tourism-analytics/)
+🔗 **Live Site:** [https://hermescolina.github.io/tourism-analytics/](https://hermescolina.github.io/tourism-analytics/)
 
 
 ---
