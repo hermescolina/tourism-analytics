@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: tour-api
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: gunicorn tours_app:app
+    rootDir: backend/tour_api
+
+  - type: web
+    name: hotel-api
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: gunicorn hotel_api:app
+    rootDir: backend/hotel_api
+
+  - type: web
+    name: car-api
+    env: python
+    plan: free
+    buildCommand: ""
+    startCommand: gunicorn car_api:app
+    rootDir: backend/car_api
+
