@@ -346,6 +346,10 @@ def upload_hotel_card_image():
 
     return jsonify({'success': True, 'filename': filename})
 
+@app.route('/')
+def health_check():
+    return jsonify({"message": "🏨 Hotel API is live!"})
+
 
 # ✅ Run Flask app
 if __name__ == '__main__':
