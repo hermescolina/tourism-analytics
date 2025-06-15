@@ -12,7 +12,7 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn hotel_api:app
+    startCommand: gunicorn hotel_app:app
     rootDir: backend/hotel_api
 
   - type: web
@@ -20,5 +20,5 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn car_api:app
+    startCommand: gunicorn car_app:app
     rootDir: backend/car_api
