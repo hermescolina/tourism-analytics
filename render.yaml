@@ -3,7 +3,7 @@ services:
     name: tour-api
     env: python
     plan: free
-    buildCommand: ""
+    buildCommand: pip install -r requirements.txt
     startCommand: gunicorn tours_app:app
     rootDir: backend/tour_api
 
@@ -11,7 +11,7 @@ services:
     name: hotel-api
     env: python
     plan: free
-    buildCommand: ""
+    buildCommand: pip install -r requirements.txt
     startCommand: gunicorn hotel_api:app
     rootDir: backend/hotel_api
 
@@ -19,6 +19,6 @@ services:
     name: car-api
     env: python
     plan: free
-    buildCommand: ""
+    buildCommand: pip install -r requirements.txt
     startCommand: gunicorn car_api:app
     rootDir: backend/car_api
