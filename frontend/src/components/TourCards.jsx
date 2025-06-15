@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import './TourCards.css';
 
@@ -61,12 +61,18 @@ export default function BrowseTours() {
     return matchesSearch && matchesLocation && matchesPrice;
   });
 
+  console.log("🖼️ image path:", `${base}/images/tourwise.png`);
+
   return (
     <div className="browse-container">
       <header className="browse-header">
         <div className="logo-section">
-          <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className="logo-image" />
-          <span className="logo-text">TourWise</span>
+          <Link to="/">
+            <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className="logo-image" />
+          </Link>
+          <Link to="/">
+            <span className="logo-text">TourWise</span>
+          </Link>
         </div>
         <h1 className="browse-title-inline">Browse Tours</h1>
         <div className="search-bar-wrapper">
@@ -80,6 +86,10 @@ export default function BrowseTours() {
           />
         </div>
       </header>
+
+
+
+
 
       <div className="browse-wrapper">
         <aside className="filter-panel">

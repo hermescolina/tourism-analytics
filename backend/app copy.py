@@ -482,6 +482,40 @@ def update_tour_video(slug, video_id):
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/api/tours/list', methods=['GET'])
+def list_all_tours():
+    try:
+        db = mysql.connector.connect(**tours_db_config)
+        with db.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT id, slug, title FROM tours ORDER BY title ASC")
+            tours = cursor.fetchall()
+        db.close()
+        return jsonify(tours)
+    except Exception as e:
+        print("❌ Error in list_all_tours:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/tours/<slug>/history-images', methods=['GET'])
+def get_tour_history_images(slug):
+    try:
+        db = mysql.connector.connect(**tours_db_config)
+        with db.cursor(dictionary=True) as cursor:
+            query = """
+                SELECT h.id, h.image_path AS url, h.caption, h.category
+                FROM tour_history_images h
+                JOIN tours t ON h.tour_id = t.id
+                WHERE t.slug = %s
+            """
+            cursor.execute(query, (slug,))
+            images = cursor.fetchall()
+        db.close()
+        return jsonify(images)
+    except Exception as e:
+        print("🔥 Error in get_tour_history_images:", e)
+        return jsonify({'error': str(e)}), 500
+
+
 # ✅ Run locally or with Gunicorn/Render
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 3001))

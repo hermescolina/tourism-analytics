@@ -10,11 +10,21 @@ export default function HotelAdmin() {
     const [loading, setLoading] = useState(true);
     const [previewURL, setPreviewURL] = useState(null);
     const [isBackground, setIsBackground] = useState(false);
+
+    // const [uploadData, setUploadData] = useState({
+    //     image: null,
+    //     description: '',
+    //     category: '',
+    // });
+
     const [uploadData, setUploadData] = useState({
         image: null,
+        cardImage: null,
         description: '',
         category: '',
+        is_background: false,
     });
+
 
     const [hotels, setHotels] = useState([]);
 
@@ -200,6 +210,60 @@ export default function HotelAdmin() {
                     {status}
                 </p>
             )}
+
+            <section className="card-image-upload">
+                <h2>🖼 Card Image</h2>
+                <div>
+                    {hotelData.hotel.card_image && (
+                        <img
+                            src={`/tourism-analytics/images/${hotelData.hotel.card_image}`}
+                            alt="Hotel Card"
+                            style={{ width: 240, borderRadius: 16, marginBottom: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                        />
+                    )}
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={e => {
+                            const file = e.target.files[0];
+                            if (file) setPreviewURL(URL.createObjectURL(file));
+                            setUploadData(prev => ({ ...prev, cardImage: file }));
+                        }}
+                    />
+                    {previewURL && uploadData.cardImage && (
+                        <img src={previewURL} alt="Card Preview" style={{ width: 180, borderRadius: 12, margin: 8 }} />
+                    )}
+                    <button
+                        onClick={async () => {
+                            if (!uploadData.cardImage) {
+                                setStatus('❌ Select a card image first.');
+                                return;
+                            }
+                            const formData = new FormData();
+                            formData.append('hotel_id', hotelData.hotel.hotel_id);
+                            formData.append('image', uploadData.cardImage);
+                            setStatus('⏳ Uploading...');
+                            const res = await fetch('http://localhost:5000/api/hotel/card-image', {
+                                method: 'POST',
+                                body: formData,
+                            });
+                            const data = await res.json();
+                            if (data.success) {
+                                setHotelData(prev => ({
+                                    ...prev,
+                                    hotel: { ...prev.hotel, card_image: data.filename }
+                                }));
+                                setStatus('✅ Card image uploaded!');
+                                setPreviewURL(null);
+                                setUploadData(prev => ({ ...prev, cardImage: null }));
+                            } else {
+                                setStatus('❌ Failed to upload card image');
+                            }
+                        }}
+                    >⬆️ Upload Card Image</button>
+                </div>
+            </section>
+
 
             <section className="hotel-list">
                 <h2>🏨 All Hotels</h2>

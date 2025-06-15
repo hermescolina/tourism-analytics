@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import './Hotel.css';
 
+import './Car.css';
 
 const base = '/tourism-analytics';
 
-export default function Hotel() {
-    const { slug } = useParams(); // get the slug from the URL
+export default function Car() {
+    const { slug } = useParams();
     const [scrolled, setScrolled] = useState(false);
-    const [hotelData, setHotelData] = useState(null);
+    const [carData, setCarData] = useState(null);
     const [error, setError] = useState(false);
 
     useEffect(() => {
@@ -20,31 +20,31 @@ export default function Hotel() {
     useEffect(() => {
         if (!slug) return;
 
-        fetch(`http://localhost:5000/api/hotel/${slug}`) // dynamic slug
+        fetch(`http://localhost:5001/api/car/${slug}`) // dynamic slug for car
             .then(res => {
-                if (!res.ok) throw new Error('Hotel not found');
+                if (!res.ok) throw new Error('Car not found');
                 return res.json();
             })
-            .then(data => setHotelData(data))
+            .then(data => setCarData(data))
             .catch(err => {
-                console.error('❌ Failed to fetch hotel data:', err);
+                console.error('❌ Failed to fetch car data:', err);
                 setError(true);
             });
     }, [slug]);
 
     if (!slug) return <Navigate to="/tourism-analytics" />;
-    if (error) return <div className="error">Hotel not found.</div>;
-    if (!hotelData) return <div className="loading">Loading hotel information...</div>;
+    if (error) return <div className="error">Car not found.</div>;
+    if (!carData) return <div className="loading">Loading car information...</div>;
 
-    const { hotel, images } = hotelData;
-    const backgroundImageUrl = hotel?.background_image
-        ? `/tourism-analytics/images/${hotel.background_image}`
+    const { car, images } = carData;
+    const backgroundImageUrl = car?.background_image
+        ? `/tourism-analytics/images/${car.background_image}`
         : '/tourism-analytics/images/default.png';
 
     return (
         <>
             <header
-                className={`hotel-header ${scrolled ? 'scrolled' : ''}`}
+                className={`car-header ${scrolled ? 'scrolled' : ''}`}
                 style={{
                     backgroundImage: `url(${backgroundImageUrl})`,
                     backgroundSize: 'cover',
@@ -52,12 +52,11 @@ export default function Hotel() {
                     backgroundRepeat: 'no-repeat',
                 }}
             >
-
                 <div className="logo-section">
-                    <Link to="/hotel-cards">
+                    <Link to="/car-cards">
                         <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className="logo-image" />
                     </Link>
-                    <Link to="/hotel-cards">
+                    <Link to="/car-cards">
                         <span className="logo-text">TourWise</span>
                     </Link>
                 </div>
@@ -69,16 +68,16 @@ export default function Hotel() {
                     </div>
 
                     <div className="action-bar">
-                        <a href={`mailto:${hotel?.email || 'info@example.com'}`}>CONTACT US</a>
+                        <a href={`mailto:${car?.email || 'info@example.com'}`}>INQUIRE</a>
                         <span className="divider">|</span>
                         <span className="globe-icon" role="img" aria-label="globe">🌐</span>
                         <span>ENGLISH</span>
-                        <button className="reserve-btn">RESERVE</button>
+                        <button className="reserve-btn">BOOK NOW</button>
                     </div>
                 </div>
 
                 <div className="tagline">
-                    Truly Authentically Filipino, Quintessentially Peninsula
+                    Travel Smart. Ride TourWise Cars.
                 </div>
             </header>
 
@@ -89,17 +88,17 @@ export default function Hotel() {
                     images
                         .filter(img => img.filename && img.category !== 'background')
                         .map((img, idx) => (
-                            <section key={`${img.filename}-${idx}`} className={`hotel-description section-${idx}`}>
+                            <section key={`${img.filename}-${idx}`} className={`car-description section-${idx}`}>
                                 <img
                                     src={`/tourism-analytics/images/${img.filename}`}
-                                    alt={img.description || img.category || 'Hotel image'}
+                                    alt={img.description || img.category || 'Car image'}
                                     loading="lazy"
                                 />
                                 <p>{img.description || 'No description available.'}</p>
                             </section>
                         ))
                 ) : (
-                    <p className="no-images">No hotel images available.</p>
+                    <p className="no-images">No car images available.</p>
                 )}
             </main>
         </>

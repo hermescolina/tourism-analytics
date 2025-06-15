@@ -279,19 +279,72 @@ def delete_hotel_image(filename):
 
     return jsonify({"message": "Image deleted successfully"}), 200
 
+# @app.route('/api/hotels', methods=['GET'])
+# def list_hotels():
+#     try:
+#         conn = get_conn()
+#         cursor = conn.cursor(dictionary=True)
+#         cursor.execute("SELECT name, slug, city, country FROM hotels ORDER BY name ASC")
+#         hotels = cursor.fetchall()
+#         return jsonify(hotels)
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+#     finally:
+#         cursor.close()
+#         conn.close()
+
 @app.route('/api/hotels', methods=['GET'])
 def list_hotels():
     try:
         conn = get_conn()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT name, slug, city, country FROM hotels ORDER BY name ASC")
+        # Select all columns you want to expose
+        # cursor.execute("SELECT hotel_id, name, slug, city, country, description, price, image FROM hotels ORDER BY name ASC")
+        # cursor.execute("SELECT hotel_id, name, slug, city, country, description, background_image FROM hotels ORDER BY name ASC")
+        cursor.execute("SELECT hotel_id, name, slug, city, country, description, background_image, card_image FROM hotels ORDER BY name ASC")
         hotels = cursor.fetchall()
-        return jsonify(hotels)
+        return jsonify(hotels)  # return as array, not wrapped in object
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
         cursor.close()
         conn.close()
+
+# import os
+# import mysql.connector
+# from flask import request, jsonify
+# from werkzeug.utils import secure_filename
+
+# (Assume db_config already exists at the top of this file)
+
+@app.route('/api/hotel/card-image', methods=['POST'])
+def upload_hotel_card_image():
+    hotel_id = request.form.get('hotel_id')
+    image = request.files.get('image')
+
+    if not hotel_id or not image:
+        return jsonify({'error': 'Missing hotel_id or image'}), 400
+
+    filename = secure_filename(image.filename)
+    # Always use absolute path to your frontend public/images
+    frontend_images_dir = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), '..', 'frontend', 'public', 'images')
+    )
+    os.makedirs(frontend_images_dir, exist_ok=True)
+    save_path = os.path.join(frontend_images_dir, filename)
+    print('Saving card image to:', save_path)
+    image.save(save_path)
+
+    print(f'LOG: SQL QUERY - UPDATE hotels SET card_image="{filename}" WHERE hotel_id={hotel_id}')
+    # Use your config here!
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor()
+    cursor.execute("UPDATE hotels SET card_image=%s WHERE hotel_id=%s", (filename, hotel_id))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+    return jsonify({'success': True, 'filename': filename})
 
 
 # ✅ Run Flask app
