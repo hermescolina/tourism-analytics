@@ -1,6 +1,5 @@
-.hotel-header {
+.car-header {
     height: 100vh;
-    /* background-image: url('/images/PeninsulaBG.png'); */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -13,24 +12,24 @@
     z-index: 1000;
 }
 
-.hotel-header.scrolled {
+.car-header.scrolled {
     height: 80px;
     background: white;
     color: black;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.hotel-header.scrolled .menu-bar,
-.hotel-header.scrolled .action-bar,
-.hotel-header.scrolled .logo-title,
-.hotel-header.scrolled .logo-subtitle,
-.hotel-header.scrolled .divider,
-.hotel-header.scrolled .menu-icon,
-.hotel-header.scrolled .menu-label {
+.car-header.scrolled .menu-bar,
+.car-header.scrolled .action-bar,
+.car-header.scrolled .logo-title,
+.car-header.scrolled .logo-subtitle,
+.car-header.scrolled .divider,
+.car-header.scrolled .menu-icon,
+.car-header.scrolled .menu-label {
     color: black;
 }
 
-.hotel-header.scrolled .tagline {
+.car-header.scrolled .tagline {
     display: none;
 }
 
@@ -50,7 +49,28 @@
     transform: translate(-50%, -50%);
     z-index: 1;
     transition: all 0.3s ease;
+    padding-left: 0;
+    /* Remove if you want it truly flush left */
 }
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo-image {
+    height: 32px;
+    width: auto;
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #15803d;
+}
+
+
 
 .menu-bar,
 .action-bar {
@@ -107,21 +127,24 @@
     text-decoration: underline;
 }
 
-.logo-section {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.logo-image {
-    height: 32px;
-    width: auto;
-}
-
-.logo-text {
-    font-size: 1.25rem;
+.logo-title {
+    font-size: clamp(0.5rem, 6vw, 1.5rem);
     font-weight: bold;
-    color: #15803d;
+    letter-spacing: 1px;
+    text-align: center;
+    white-space: nowrap;
+    padding-left: 18rem;
+    padding-right: 8rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.logo-subtitle {
+    font-size: 1.2rem;
+    letter-spacing: 4px;
+    padding-left: 18rem;
+    padding-right: 8rem;
 }
 
 .tagline {
@@ -139,7 +162,7 @@
 }
 
 /* Shared section base */
-.hotel-description {
+.car-description {
     background: white;
     color: #222;
     padding: 4rem 2rem;
@@ -152,7 +175,7 @@
     overflow: hidden;
 }
 
-.hotel-description img {
+.car-description img {
     float: left;
     max-width: 300px;
     height: auto;
@@ -161,12 +184,10 @@
     border-radius: 8px;
 }
 
-
 .first-section {
     margin-top: 0;
     clear: both;
 }
-
 
 .second-section {
     margin-top: -3rem;
@@ -176,7 +197,7 @@
 .third-section,
 .fourth-section,
 .fifth-section,
-sixth-section {
+.sixth-section {
     margin-top: -3rem;
     clear: both;
 }

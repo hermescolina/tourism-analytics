@@ -31,28 +31,6 @@ export default function TourPage() {
             });
     }, [slug]);
 
-    // useEffect(() => {
-    //     fetch(`${apiBase}/api/tours/${slug}`)
-    //         .then(res => {
-    //             if (!res.ok) throw new Error('Tour not found');
-    //             return res.json();
-    //         })
-    //         .then(data => {
-    //             console.log('✅ Server responded with:', data);
-    //             setTour(data);
-    //             document.title = `TourWise | ${data.title}`;
-    //         })
-    //         .catch(err => {
-    //             console.error('❌ Failed to load tour:', err);
-    //             setError('Tour not found or server error.');
-    //         });
-    //     // 👉 Fetch videos associated with this tour
-    //     fetch(`${apiBase}/api/tours/${slug}/videos`)
-    //         .then(res => res.json())
-    //         .then(setTourVideos)
-    //         .catch(err => console.error('❌ Failed to fetch videos:', err));
-    // }, [slug]);
-
     if (error) return <div className="tour-container">{error}</div>;
     if (!tour) return <div className="tour-container">Loading...</div>;
 
@@ -69,10 +47,12 @@ export default function TourPage() {
         <div className="tour-container">
             <header className="browse-header">
                 <div className="logo-section">
-                    <Link to="/">
+                    <Link to="/tour-cards">
                         <img src={imageUrl} alt="TourWise" className="logo-image" />
                     </Link>
-                    <span className="logo-text">TourWise</span>
+                    <Link to="/tour-cards">
+                        <span className="logo-text">TourWise</span>
+                    </Link>
                 </div>
                 <h1 className="browse-title-inline">{tour.title}</h1>
                 <div className="tour-actions">
@@ -131,16 +111,6 @@ export default function TourPage() {
                     </div>
                 </section>
             )}
-
-            {/* <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
-                <iframe
-                    src="https://www.youtube.com/embed/WwqRUYJrPJ4"
-                    title="YouTube video"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
-                ></iframe>
-            </div> */}
 
             {/* Category Selector */}
             <div className="category-selector" style={{ margin: '2rem 0' }}>

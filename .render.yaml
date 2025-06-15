@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: tour-api
+    env: python
+    rootDir: tour_api
+    startCommand: gunicorn tour_app:app
+
+  - type: web
+    name: hotel-api
+    env: python
+    rootDir: hotel_api
+    startCommand: gunicorn hotel_app:app
+
+  - type: web
+    name: car-api
+    env: python
+    rootDir: car_api
+    startCommand: gunicorn car_app:app
+
