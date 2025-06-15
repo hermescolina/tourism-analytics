@@ -22,4 +22,3 @@ services:
     buildCommand: ""
     startCommand: gunicorn car_api:app
     rootDir: backend/car_api
-
