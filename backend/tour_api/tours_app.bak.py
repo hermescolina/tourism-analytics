@@ -1,5 +1,3 @@
-import time
-import os
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
@@ -7,6 +5,8 @@ import mysql.connector
 from dotenv import load_dotenv
 from fb_auto_post import fb_bp
 from fb_auto_post import post_tour_to_facebook_internal
+
+import os
 
 # ✅ Load environment variables from .env.tours
 load_dotenv(dotenv_path=".env.tours")
@@ -89,29 +89,29 @@ def add_tour():
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (title, slug, location, price, description, start_date, end_date, available_slots, image_filename, category_id))
             db.commit()
-
-        # ✅ POST to Facebook
-            try:
-                time.sleep(2)
-                post_tour_to_facebook_internal({
-                    "title": title,
-                    "description": description,
-                    "location": location,
-                    "price": price,
-                    "image_url": f"https://api.tourwise.shop/uploads/{image_filename}" if image_filename else "",
-                    "slug": slug
-                })
-            except Exception as fb_err:
-                print("⚠️ Facebook auto-post failed:", fb_err)
-
-
-
         db.close()
+
+        # ✅ Auto-post to Facebook
+        try:
+            image_url = f"https://app.tourwise.shop/tourism-analytics/uploads/{image_filename}" if image_filename else ""
+            fb_payload = {
+                "title": title,
+                "description": description,
+                "location": location,
+                "price": price,
+                "slug": slug,
+                "image_url": image_url
+            }
+            post_tour_to_facebook_internal(fb_payload)
+            print("📢 Facebook post created successfully.")
+        except Exception as fb_err:
+            print("⚠️ Facebook post failed:", fb_err)
 
         return jsonify({"message": "Tour added successfully"}), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 
 
@@ -131,7 +131,7 @@ def get_landing_data():
     # Connect to tours DB
     db_tours = mysql.connector.connect(**tours_db_config)
     with db_tours.cursor(dictionary=True) as cursor:
-        cursor.execute("SELECT title, location, price, image, description, slug FROM tours;")
+        cursor.execute("SELECT title, location, price, image, description, slug, start_date, end_date,available_slots  FROM tours;")
         tours = cursor.fetchall()
 
     db_tours.close()
@@ -152,6 +152,9 @@ def get_landing_data():
             tour['image'] = f"/uploads/{raw_image}"
         else:
             tour['image'] = ""
+
+        tour['start_date'] = str(tour['start_date']) if tour.get('start_date') else None
+        tour['end_date'] = str(tour['end_date']) if tour.get('end_date') else None
         
         processed_tours.append(tour)
 
@@ -159,7 +162,7 @@ def get_landing_data():
     # Connect to hotels DB
     db_hotels = mysql.connector.connect(**hotels_db_config)
     with db_hotels.cursor(dictionary=True) as cursor:
-        cursor.execute("SELECT name, slug, description, background_image AS image FROM hotels LIMIT 6")
+        cursor.execute("SELECT name, slug, description, background_image AS image FROM hotels LIMIT 6;")
         hotels = cursor.fetchall()
 
     db_hotels.close()
@@ -697,4 +700,5 @@ if __name__ == '__main__':
         print(f"{rule} → {', '.join(rule.methods)}")
 
     app.run(host='0.0.0.0', port=port)
+    
 
