@@ -1,0 +1,30 @@
+.dashboardContainer {
+    max-width: 800px;
+    margin: auto;
+    padding: 2rem;
+    background: #fff;
+}
+
+.profileCard {
+    background: #f1f1f1;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.bookingsSection .bookingCard {
+    background: #fafafa;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+}
+
+.logoutBtn {
+    background: crimson;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}

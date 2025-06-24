@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import './HotelCards.css';
+import styles from './HotelCards.module.css';
 
 const base = '/tourism-analytics';
 
@@ -17,7 +17,7 @@ export default function BrowseHotels() {
   const safeMaxPrice = Number(maxPrice) || Number.MAX_SAFE_INTEGER;
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/hotels')
+    fetch('https://api2.tourwise.shop/api/hotels')
       .then(async res => {
         const text = await res.text();
         console.log("📦 Raw response text from API:", text);
@@ -49,22 +49,22 @@ export default function BrowseHotels() {
   const filteredHotels = hotels;
 
   return (
-    <div className="browse-container">
-      <header className="browse-header">
-        <div className="logo-section">
+    <div className={styles.browseContainer}>
+      <header className={styles.browseHeader}>
+        <div className={styles.logoSection}>
           <Link to="/">
-            <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className="logo-image" />
+            <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className={styles.logoImage} />
           </Link>
           <Link to="/">
-            <span className="logo-text">TourWise</span>
+            <span className={styles.logoText}>TourWise</span>
           </Link>
         </div>
-        <h1 className="browse-title-inline">Browse Hotels</h1>
-        <div className="search-bar-wrapper">
+        <h1 className={styles.browseTitleInline}>Browse Hotels</h1>
+        <div className={styles.searchBarWrapper}>
           <input
             type="text"
             placeholder="🔍 Search hotels"
-            className="search-bar"
+            className={styles.searchBar}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             onFocus={() => setLocationFilter('')}
@@ -72,27 +72,27 @@ export default function BrowseHotels() {
         </div>
       </header>
 
-      <div className="browse-wrapper">
-        <aside className="filter-panel">
-          <h2 className="filter-title">Filters</h2>
-          <div className="filter-group">
-            <label className="filter-label">Location</label>
+      <div className={styles.browseWrapper}>
+        <aside className={styles.filterPanel}>
+          <h2 className={styles.filterTitle}>Filters</h2>
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Location</label>
             <input
               type="text"
-              className="filter-input"
+              className={styles.filterinput}
               placeholder="Enter location"
               value={locationFilter}
               onChange={e => setLocationFilter(e.target.value)}
               onFocus={() => setSearchTerm('')}
             />
           </div>
-          <div className="filter-group">
-            <label className="filter-label">Price Range</label>
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Price Range</label>
             <p>No price data available</p>
           </div>
-          <div className="filter-group">
-            <label className="filter-label">Rating</label>
-            <div className="filter-stars">
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Rating</label>
+            <div className={styles.filterStars}>
               {[1, 2, 3, 4, 5].map(star => (
                 <span key={star}>★</span>
               ))}
@@ -100,13 +100,13 @@ export default function BrowseHotels() {
           </div>
         </aside>
 
-        <div className="browse-content">
-          <div className="hotel-grid">
+        <div className={styles.browseContent}>
+          <div className={styles.hotelGrid}>
             {filteredHotels.length ? (
               filteredHotels.map((hotel, index) => (
                 <div
                   key={index}
-                  className="hotel-card"
+                  className={styles.hotelCard}
                   onClick={() => handleCardClick(hotel)}
                 >
                   <img
@@ -116,17 +116,17 @@ export default function BrowseHotels() {
                         : `${base}/images/hotel-placeholder.png`
                     }
                     alt={hotel.name}
-                    className="hotel-card-image"
+                    className={styles.hotelCardImage}
                   />
 
-                  <div className="hotel-card-details">
-                    <h3 className="hotel-title">{hotel.name}</h3>
-                    <p className="hotel-location">{hotel.city}, {hotel.country}</p>
+                  <div className={styles.hotelCardDetails}>
+                    <h3 className={styles.hotelTitle}>{hotel.name}</h3>
+                    <p className={styles.hotelLocation}>{hotel.city}, {hotel.country}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="no-results-message">No matching hotels found.</p>
+              <p className={styles.noResultsMessage}>No matching hotels found.</p>
             )}
           </div>
         </div>

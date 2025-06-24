@@ -33,7 +33,7 @@ export default function CarAdmin() {
             return;
         }
 
-        fetch('http://localhost:5001/api/car', {
+        fetch('https://api3.tourwise.shop/api/car', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newCar)
@@ -55,7 +55,7 @@ export default function CarAdmin() {
     };
 
     const fetchCars = () => {
-        fetch('http://localhost:5001/api/cars')
+        fetch('https://api3.tourwise.shop/api/cars')
             .then(res => res.json())
             .then(data => {
                 setCars(data);
@@ -65,7 +65,7 @@ export default function CarAdmin() {
 
     const fetchImages = async () => {
         try {
-            const res = await fetch(`http://localhost:5001/api/car/${carData.car.slug}`);
+            const res = await fetch(`https://api3.tourwise.shop/api/car/${carData.car.slug}`);
             const data = await res.json();
             setCarData(data); // or setImages(data.images) if you manage images separately
         } catch (error) {
@@ -74,7 +74,7 @@ export default function CarAdmin() {
     };
 
     useEffect(() => {
-        fetch(`http://localhost:5001/api/car/${slug}`)
+        fetch(`https://api3.tourwise.shop/api/car/${slug}`)
             .then(res => res.json())
             .then(data => {
                 setCarData(data);
@@ -96,7 +96,7 @@ export default function CarAdmin() {
     };
 
     const handleSaveImage = (image) => {
-        fetch(`http://localhost:5001/api/car/image/${image.image_id}`, {
+        fetch(`https://api3.tourwise.shop/api/car/image/${image.image_id}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -116,7 +116,7 @@ export default function CarAdmin() {
     };
 
     const handleDeleteImage = (image_id) => {
-        fetch(`http://localhost:5001/api/car/image/${image_id}`, {
+        fetch(`https://api3.tourwise.shop/api/image/${image_id}`, {
             method: 'DELETE'
         })
             .then(res => {
@@ -165,7 +165,7 @@ export default function CarAdmin() {
             is_background: uploadData.is_background,
         });
 
-        fetch('http://localhost:5001/api/car/image', {
+        fetch('https://api3.tourwise.shop/api/image', {
             method: 'POST',
             body: formData,
         })
@@ -196,52 +196,6 @@ export default function CarAdmin() {
     };
 
 
-    // const handleUploadSubmit = () => {
-    //     if (!uploadData.image) {
-    //         setStatus('❌ Please select an image to upload.');
-    //         return;
-    //     }
-
-    //     const formData = new FormData();
-    //     formData.append('car_id', carData.car.car_id);
-    //     formData.append('image', uploadData.image);
-    //     formData.append('category', uploadData.category);
-    //     formData.append('description', uploadData.description);
-    //     formData.append('is_background', uploadData.is_background);
-
-    //     console.log('📤 Uploading FormData:', {
-    //         car_id: carData.car.car_id,
-    //         image: uploadData.image?.name,
-    //         category: uploadData.category,
-    //         description: uploadData.description,
-    //         is_background: uploadData.is_background
-    //     });
-
-    //     fetch('http://localhost:5001/api/car/image', {
-    //         method: 'POST',
-    //         body: formData,
-    //     })
-    //         .then(res => res.json())
-    //         .then(data => {
-    //             if (data.error) {
-    //                 setStatus(`❌ ${data.error}`);
-    //             } else {
-    //                 setStatus(`✅ Image "${data.filename}" uploaded`);
-    //                 setCarData(prev => ({
-    //                     ...prev,
-    //                     images: [...prev.images, {
-    //                         filename: data.filename,
-    //                         category: uploadData.category,
-    //                         description: uploadData.description,
-    //                     }]
-    //                 }));
-    //                 setUploadData({ image: null, description: '', category: '' });
-    //                 setPreviewURL(null);
-    //                 fetchImages();
-    //             }
-    //         })
-    //         .catch(() => setStatus('❌ Server error while uploading image'));
-    // };
 
     useEffect(() => {
         if (status) {
@@ -304,7 +258,7 @@ export default function CarAdmin() {
                         formData.append('car_id', carData.car.car_id);
                         formData.append('image', uploadData.card_image);
 
-                        fetch('http://localhost:5001/api/car/card-image', {
+                        fetch('https://api3.tourwise.shop/api/car/card-image', {
                             method: 'POST',
                             body: formData,
                         })

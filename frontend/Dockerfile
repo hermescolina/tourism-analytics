@@ -1,13 +1,20 @@
-# Step 1: Build the app
-FROM node:18 AS build
-WORKDIR /app
-COPY . .
-RUN npm install
-RUN npm run build
+# Use Node.js official image
+FROM node:20-slim
 
-# Step 2: Serve the build with Nginx
-FROM nginx:alpine
-COPY --from=build /app/build /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# Set working directory
+WORKDIR /app
+
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the project files
+COPY . .
+
+# Expose the Vite dev server port
+EXPOSE 5173
+
+# Start Vite development server
+CMD ["npm", "run", "dev", "--", "--host"]
+
 

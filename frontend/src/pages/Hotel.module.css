@@ -1,0 +1,266 @@
+.hotelHeader {
+    /* Fullscreen hero at top */
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 1000;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: white;
+    transition: height 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+
+
+.hotelHeader.scrolled {
+    height: 80px;
+    background-image: none;
+    background-color: white;
+    color: black;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Elements that need color swap when scrolled */
+.hotelHeader.scrolled .menuBar,
+.hotelHeader.scrolled .actionBar,
+.hotelHeader.scrolled .logoTitle,
+.hotelHeader.scrolled .logoSubtitle,
+.hotelHeader.scrolled .divider,
+.hotelHeader.scrolled .menu-icon,
+.hotelHeader.scrolled .menu-label {
+    color: black;
+}
+
+/* Hide tagline when scrolled */
+.hotelHeader.scrolled .tagline {
+    display: none;
+}
+
+/* Layout inside header */
+.headerContent {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6rem;
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
+    position: absolute;
+    top: 7%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+/* Menu bar and action items */
+.menuBar,
+.actionBar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    color: white;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.divider {
+    color: white;
+    opacity: 0.6;
+}
+
+.reserveBtn {
+    padding: 0.5rem 1.2rem;
+    background: white;
+    color: black;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.reserveBtn:hover {
+    background: #a07b49;
+}
+
+/* Links and button alignment */
+.actionBar a,
+.actionBar span,
+.actionBar button {
+    display: flex;
+    align-items: center;
+}
+
+.actionBar a {
+    color: white;
+    background: transparent;
+    text-decoration: none;
+    outline: none;
+}
+
+.actionBar a:focus,
+.actionBar a:hover,
+.actionBar a:active {
+    color: #ccc;
+    background: transparent;
+    outline: none;
+    text-decoration: underline;
+}
+
+/* Logo section */
+.logoSection {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 3;
+}
+
+.logoImage {
+    height: 32px;
+    width: auto;
+}
+
+.logoText {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #15803d;
+}
+
+/* Tagline styling */
+.tagline {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 3rem;
+    text-align: center;
+    z-index: 1;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.3s ease;
+}
+
+
+
+/* Main content area */
+.mainContainer {
+    width: 100vw;
+    max-width: 100vw;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    width: 100%;
+}
+
+/* Description section below header */
+/* .hotelDescription {
+    background: white;
+    color: #222;
+    padding: 4rem 2rem;
+    max-width: 100vw;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    text-align: justify;
+    overflow: hidden;
+    flex-wrap: wrap;
+}
+
+.leftImage {
+    flex-direction: row;
+}
+
+.rightImage {
+    flex-direction: row-reverse;
+}
+
+.hotelDescription img {
+    float: left;
+    max-width: 500px;
+    height: auto;
+    margin-right: 2rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
+
+.hotelDescription p {
+    flex: 1;
+    font-size: 1.1rem;
+} */
+
+
+.hotelDescription {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.leftImage {
+    flex-direction: row;
+}
+
+.rightImage {
+    flex-direction: row-reverse;
+}
+
+.hotelDescription img {
+    width: 45%;
+    height: auto;
+    border-radius: 0.5rem;
+    display: block;
+}
+
+.hotelDescription p {
+    flex: 1;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+
+/* Margin tweaks for section alignment */
+.firstSection {
+    margin-top: 0;
+    clear: both;
+}
+
+.secondSection,
+.thirdSection,
+.fourthSection,
+.fifthSection,
+.sixthSection {
+    margin-top: -3rem;
+    clear: both;
+}
+
+@media (max-width: 768px) {
+
+    @media (max-width: 768px) {
+        .tagline {
+            font-size: 1.25rem;
+            bottom: 10rem;
+            white-space: normal;
+            max-width: 90%;
+            text-align: center;
+            padding: 0 1rem;
+        }
+    }
+
+    .actionBar,
+    .menuBar {
+        display: none;
+    }
+}

@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import './TourCards.css';
+import './TourCardsAdmin.css';
 
 const base = '/tourism-analytics';
-const apiBase = 'http://localhost:3001';
+const apiBase = 'https://api.tourwise.shop';
 
 export default function BrowseTours() {
   const navigate = useNavigate();

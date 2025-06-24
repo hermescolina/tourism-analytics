@@ -1,16 +1,16 @@
-.tour-slots {
+.tourSlots {
     font-size: 0.95rem;
     color: #444;
     margin-top: 0.25rem;
 }
 
-.tour-dates {
+.tourDates {
     font-size: 0.9rem;
     color: #444;
     margin-top: 0.25rem;
 }
 
-.image-title-overlay {
+.imageTitleOverlay {
     position: absolute;
     bottom: 12px;
     left: 12px;
@@ -22,12 +22,12 @@
     border-radius: 6px;
 }
 
-.tour-card-image-wrapper {
+.tourCardImageWrapper {
     position: relative;
     padding: 0;
 }
 
-.tour-card-image {
+.tourCardImage {
     width: 100%;
     height: 200px;
     object-fit: cover;
@@ -36,13 +36,15 @@
     border-top-right-radius: 12px;
 }
 
-.browse-container {
+.browseContainer {
+    max-width: 1920px;
     min-height: 100vh;
     background: linear-gradient(to bottom right, #e7ebe8, #eff1f1);
     padding: 0;
 }
 
-.browse-header {
+.browseHeader {
+
     position: fixed;
     top: 0;
     left: 0;
@@ -56,7 +58,7 @@
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 }
 
-.browse-message {
+.browseMessage {
     text-align: center;
     margin-top: 3rem;
     margin-bottom: 3rem;
@@ -64,35 +66,35 @@
     color: #374151;
 }
 
-.logo-section {
+.logoSection {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.logo-image {
+.logoImage {
     height: 32px;
     width: auto;
 }
 
-.logo-text {
+.logoText {
     font-size: 1.25rem;
     font-weight: bold;
     color: #15803d;
 }
 
-.browse-title-inline {
+.browseTitleInline {
     font-size: 1.5rem;
     font-weight: bold;
     color: #1f2937;
 }
 
-.search-bar-wrapper {
+.searchBarWrapper {
     max-width: 300px;
     width: 100%;
 }
 
-.search-bar {
+.searchBar {
     width: 100%;
     padding: 0.4rem 0.75rem;
     border-radius: 8px;
@@ -100,22 +102,24 @@
 }
 
 /* MAIN BODY WRAPPER */
-.browse-wrapper {
-    padding-top: 6rem;
+.browseWrapper {
+    padding-top: 3rem;
     display: flex;
     flex-direction: column;
+    padding-left: 0rem;
+
 }
 
-.browse-content {
+.browseContent {
     display: flex;
 }
 
 /* FIXED SIDEBAR */
-.filter-panel {
+.filterPanel {
     position: fixed;
     top: 5rem;
     left: 0;
-    width: 11rem;
+    width: 16rem;
     height: calc(100vh - 10rem);
     background-color: #f3f4f6;
     padding: 1.25rem;
@@ -125,32 +129,33 @@
     border-radius: 0 1rem 1rem 0;
 }
 
-.filter-title {
+
+.filterTitle {
     font-size: 1.1rem;
     font-weight: bold;
     margin-bottom: 1rem;
 }
 
-.filter-group {
+.filterGroup {
     margin-bottom: 1rem;
 }
 
-.filter-label {
+.filterLabel {
     display: block;
     font-size: 0.875rem;
     font-weight: 600;
     margin-bottom: 0.25rem;
 }
 
-.filter-input,
-.filter-range {
+.filterInput,
+.filterRange {
     width: 100%;
     padding: 0.25rem;
     border-radius: 0.375rem;
     border: 1px solid #d1d5db;
 }
 
-.filter-stars {
+.filterStars {
     display: flex;
     gap: 0.25rem;
     font-size: 1.25rem;
@@ -158,17 +163,17 @@
 }
 
 /* TOUR GRID */
-.tour-grid {
+.tourGrid {
     margin-left: 16rem;
     flex: 1;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
-    padding: 2rem;
+    padding: 2rem
 }
 
 /* CARD STYLING */
-.tour-card {
+.tourCard {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -181,12 +186,12 @@
     transition: transform 0.2s ease;
 }
 
-.tour-card:hover {
+.tourCard:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
 }
 
-.tour-card-details {
+.tourCard-details {
     padding: 0.5rem 1rem 1rem;
     flex-grow: 1;
     display: flex;
@@ -194,30 +199,30 @@
     justify-content: flex-start;
 }
 
-.tour-title {
+.tourTitle {
     font-size: 1rem;
     font-weight: 600;
     color: #1f2937;
     margin-bottom: 0.25rem;
 }
 
-.tour-description {
+.tourDescription {
     font-size: 0.875rem;
     color: #6b7280;
     margin-bottom: 0.4rem;
 }
 
-.tour-price {
+.tourPrice {
     font-weight: bold;
     color: #059669;
     margin-top: 0.4rem;
 }
 
-.tour-card-content {
+.tourCardContent {
     padding: 0 1.25rem 1.25rem;
 }
 
-.clicked-tour-banner {
+.clickedTourBanner {
     background: #e0f2fe;
     color: #0369a1;
     padding: 0.75rem 1rem;
@@ -225,4 +230,37 @@
     margin: 1rem 2rem;
     font-size: 1rem;
     font-weight: 500;
+}
+
+/* Smaller text on mobile */
+@media (max-width: 768px) {
+
+    .logoSection {
+        transform: translateX(-15px);
+    }
+
+    .logoImage {
+        transform: translateX(0px);
+    }
+
+    .logoText {
+        font-size: 0.75rem;
+        text-align: center;
+        margin-right: 2rem;
+        transform: translateX(-5px);
+    }
+
+    .searchBar {
+        transform: translateX(-5px);
+    }
+
+    .tourGrid {
+        margin-left: 0rem;
+        padding: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    }
+
+    .filterPanel {
+        display: none !important;
+    }
 }

@@ -20,7 +20,7 @@ export default function Car() {
     useEffect(() => {
         if (!slug) return;
 
-        fetch(`http://localhost:5001/api/car/${slug}`) // dynamic slug for car
+        fetch(`https://api3.tourwise.shop/api/car/${slug}`) // dynamic slug for car
             .then(res => {
                 if (!res.ok) throw new Error('Car not found');
                 return res.json();

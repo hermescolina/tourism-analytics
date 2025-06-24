@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
+import { apiBaseTour, apiBaseHotel, apiBaseCar, frontendBase } from '../config';
 import React, { useEffect, useState } from 'react';
-import './HotelAdmin.css';
+import styles from './HotelAdmin.module.css';
 
 //export default function HotelAdmin({ slug = 'the-peninsula-manila' }) {
 export default function HotelAdmin() {
@@ -11,11 +12,6 @@ export default function HotelAdmin() {
     const [previewURL, setPreviewURL] = useState(null);
     const [isBackground, setIsBackground] = useState(false);
 
-    // const [uploadData, setUploadData] = useState({
-    //     image: null,
-    //     description: '',
-    //     category: '',
-    // });
 
     const [uploadData, setUploadData] = useState({
         image: null,
@@ -46,7 +42,7 @@ export default function HotelAdmin() {
             return;
         }
 
-        fetch('http://localhost:5000/api/hotel', {
+        fetch(`${apiBaseHotel}/api/hotel`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newHotel)
@@ -70,7 +66,7 @@ export default function HotelAdmin() {
     };
 
     const fetchHotels = () => {
-        fetch('http://localhost:5000/api/hotels')
+        fetch(`${apiBaseHotel}/api/hotels`)
             .then(res => res.json())
             .then(data => {
                 setHotels(data);
@@ -79,7 +75,7 @@ export default function HotelAdmin() {
     };
 
     useEffect(() => {
-        fetch(`http://localhost:5000/api/hotel/${slug}`)
+        fetch(`${apiBaseHotel}/api/hotel/${slug}`)
             .then(res => res.json())
             .then(data => {
                 setHotelData(data);
@@ -101,7 +97,7 @@ export default function HotelAdmin() {
     };
 
     const handleSaveImage = (image) => {
-        fetch(`http://localhost:5000/api/hotel/image/${image.filename}`, {
+        fetch(`${apiBaseHotel}/api/hotel/image/${image.filename}`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -120,7 +116,7 @@ export default function HotelAdmin() {
     };
 
     const handleDeleteImage = (filename) => {
-        fetch(`http://localhost:5000/api/hotel/image/${filename}`, {
+        fetch(`${apiBaseHotel}/api/hotel/image/${filename}`, {
             method: 'DELETE'
         })
             .then(res => {
@@ -168,7 +164,7 @@ export default function HotelAdmin() {
             is_background: uploadData.is_background
         });
 
-        fetch('http://localhost:5000/api/hotel/image', {
+        fetch(`${apiBaseHotel}/api/hotel/image`, {
             method: 'POST',
             body: formData,
         })
@@ -203,15 +199,15 @@ export default function HotelAdmin() {
     if (loading) return <div className="loading">⏳ Loading hotel information...</div>;
 
     return (
-        <div className="admin-container">
+        <div className={styles.adminContainer}>
             <h1>🛠 Hotel Admin: {hotelData.hotel.name}</h1>
             {status && (
-                <p className={`status-message ${status.includes('❌') ? 'error' : 'success'}`}>
+                <p className={`${styles.statusMessage} ${status.includes('❌') ? 'error' : 'success'}`}>
                     {status}
                 </p>
             )}
 
-            <section className="card-image-upload">
+            <section className={styles.cardImageUpload}>
                 <h2>🖼 Card Image</h2>
                 <div>
                     {hotelData.hotel.card_image && (
@@ -243,7 +239,7 @@ export default function HotelAdmin() {
                             formData.append('hotel_id', hotelData.hotel.hotel_id);
                             formData.append('image', uploadData.cardImage);
                             setStatus('⏳ Uploading...');
-                            const res = await fetch('http://localhost:5000/api/hotel/card-image', {
+                            const res = await fetch(`${apiBaseHotel}/api/hotel/card-image`, {
                                 method: 'POST',
                                 body: formData,
                             });
@@ -265,7 +261,7 @@ export default function HotelAdmin() {
             </section>
 
 
-            <section className="hotel-list">
+            <section className={styles.hotelList}>
                 <h2>🏨 All Hotels</h2>
                 <ul>
                     {hotels.map(h => (
@@ -289,7 +285,7 @@ export default function HotelAdmin() {
                 </ul>
             </section>
 
-            <section className="add-hotel-form">
+            <section className={styles.addHotelForm}>
                 <h2>➕ Add New Hotel</h2>
                 <input name="name" placeholder="Hotel Name" value={newHotel.name} onChange={handleNewHotelChange} />
                 <input name="slug" placeholder="Slug" value={newHotel.slug} onChange={handleNewHotelChange} />
@@ -313,7 +309,7 @@ export default function HotelAdmin() {
             <section>
                 <h2>🖼 Hotel Images</h2>
 
-                <div className="upload-form">
+                <div className={styles.uploadForm}>
                     <h3>➕ Add New Image</h3>
 
                     {previewURL && (
@@ -367,19 +363,17 @@ export default function HotelAdmin() {
                     <button onClick={handleUploadSubmit}>⬆️ Upload</button>
                 </div>
 
-                {/* {hotelData.images.map((img, i) => (
-                    <div key={img.filename} className="image-edit"> */}
 
                 {hotelData.images
                     .filter(img => img.filename) // ✅ Skip images without a filename
                     .map((img, i) => (
-                        <div key={img.filename} className="image-edit">
+                        <div key={img.filename} className={styles.imageEdit}>
                             <img
                                 src={`/tourism-analytics/images/${img.filename}`}
                                 alt={`Preview of ${img.category || 'image'}`}
                                 loading="lazy"
                             />
-                            <div className="image-fields">
+                            <div className={styles.imageFields}>
                                 <textarea
                                     value={img.description ?? ''}
                                     onChange={(e) => updateImageField(i, 'description', e.target.value)}
@@ -391,9 +385,9 @@ export default function HotelAdmin() {
                                     onChange={(e) => updateImageField(i, 'category', e.target.value)}
                                     placeholder="Category"
                                 />
-                                <div className="actions">
+                                <div className={styles.actions}>
                                     <button onClick={() => handleSaveImage(img)}>📏 Save</button>
-                                    <button className="delete-btn" onClick={() => handleDeleteImage(img.filename)}>🗑️ Delete</button>
+                                    <button className={styles.deleteBtn} onClick={() => handleDeleteImage(img.filename)}>🗑️ Delete</button>
                                 </div>
                             </div>
                         </div>

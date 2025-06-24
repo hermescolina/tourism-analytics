@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { apiBaseTour, apiBaseHotel, apiBaseCar } from '../config';
 import { Link, useParams, Navigate } from 'react-router-dom';
-import './Hotel.css';
-
+import styles from './Hotel.module.css';
 
 const base = '/tourism-analytics';
 
 export default function Hotel() {
-    const { slug } = useParams(); // get the slug from the URL
+    const { slug } = useParams();
     const [scrolled, setScrolled] = useState(false);
     const [hotelData, setHotelData] = useState(null);
     const [error, setError] = useState(false);
@@ -18,14 +18,26 @@ export default function Hotel() {
     }, []);
 
     useEffect(() => {
-        if (!slug) return;
+        if (!slug) {
+            console.warn('⚠️ No slug provided, skipping fetch.');
+            return;
+        }
 
-        fetch(`http://localhost:5000/api/hotel/${slug}`) // dynamic slug
+        console.log(`🔍 Fetching hotel data from: ${apiBaseHotel}/api/hotel/${slug}`);
+
+        fetch(`${apiBaseHotel}/api/hotel/${slug}`)
             .then(res => {
-                if (!res.ok) throw new Error('Hotel not found');
+                console.log('📥 Raw Response:', res);
+                if (!res.ok) throw new Error(`Hotel not found: ${res.status}`);
                 return res.json();
             })
-            .then(data => setHotelData(data))
+            .then(data => {
+                console.log('✅ Parsed hotel data:', data);
+                Object.entries(data).forEach(([key, value]) => {
+                    console.log(`🔑 ${key}:`, value);
+                });
+                setHotelData(data);
+            })
             .catch(err => {
                 console.error('❌ Failed to fetch hotel data:', err);
                 setError(true);
@@ -33,73 +45,82 @@ export default function Hotel() {
     }, [slug]);
 
     if (!slug) return <Navigate to="/tourism-analytics" />;
-    if (error) return <div className="error">Hotel not found.</div>;
-    if (!hotelData) return <div className="loading">Loading hotel information...</div>;
+    if (error) return <div className={styles.error}>Hotel not found.</div>;
+    if (!hotelData) return <div className={styles.loading}>Loading hotel information...</div>;
 
     const { hotel, images } = hotelData;
     const backgroundImageUrl = hotel?.background_image
-        ? `/tourism-analytics/images/${hotel.background_image}`
-        : '/tourism-analytics/images/default.png';
-
+        ? `${base}/images/${hotel.background_image}`
+        : `${base}/images/default.png`;
+    console.log("🏨 Hotel data:", hotel.description);
     return (
         <>
             <header
-                className={`hotel-header ${scrolled ? 'scrolled' : ''}`}
-                style={{
-                    backgroundImage: `url(${backgroundImageUrl})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundRepeat: 'no-repeat',
-                }}
+                className={`${styles.hotelHeader} ${scrolled ? styles.scrolled : ''}`}
+                style={
+                    !scrolled
+                        ? { backgroundImage: `url(${backgroundImageUrl})` }
+                        : {}
+                }
             >
 
-                <div className="logo-section">
+                <div className={styles.logoSection}>
                     <Link to="/hotel-cards">
-                        <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className="logo-image" />
+                        <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className={styles.logoImage} />
                     </Link>
                     <Link to="/hotel-cards">
-                        <span className="logo-text">TourWise</span>
+                        <span className={styles.logoText}>TourWise</span>
                     </Link>
                 </div>
 
-                <div className="header-content">
-                    <div className="menu-bar">
-                        <span className="menu-icon">≡</span>
-                        <span className="menu-label">MENU</span>
+                <div className={styles.headerContent}>
+                    <div className={styles.menuBar}>
+                        <span className={styles.menuIcon}>≡</span>
+                        <span className={styles.menuLabel}>MENU</span>
                     </div>
 
-                    <div className="action-bar">
+                    <div className={styles.actionBar}>
                         <a href={`mailto:${hotel?.email || 'info@example.com'}`}>CONTACT US</a>
-                        <span className="divider">|</span>
-                        <span className="globe-icon" role="img" aria-label="globe">🌐</span>
+                        <span className={styles.divider}>|</span>
+                        <span className={styles.globeIcon} role="img" aria-label="globe">🌐</span>
                         <span>ENGLISH</span>
-                        <button className="reserve-btn">RESERVE</button>
+                        <button className={styles.reserveBtn}>RESERVE</button>
                     </div>
                 </div>
 
-                <div className="tagline">
-                    Truly Authentically Filipino, Quintessentially Peninsula
+                <div className={styles.tagline}>
+                    <p>{hotel.description || 'No description available.'}</p>
                 </div>
             </header>
 
-            <div style={{ height: '20vh' }}></div>
+            {/* Spacer to offset the fixed header */}
+            <div style={{ height: '50vh' }}></div>
 
-            <main>
+            <main className={styles.mainContainer}>
                 {images && images.length > 0 ? (
                     images
                         .filter(img => img.filename && img.category !== 'background')
-                        .map((img, idx) => (
-                            <section key={`${img.filename}-${idx}`} className={`hotel-description section-${idx}`}>
-                                <img
-                                    src={`/tourism-analytics/images/${img.filename}`}
-                                    alt={img.description || img.category || 'Hotel image'}
-                                    loading="lazy"
-                                />
-                                <p>{img.description || 'No description available.'}</p>
-                            </section>
-                        ))
+                        .map((img, idx) => {
+                            const imageUrl = `${base}/images/${img.filename}`;
+                            console.log("🖼️ Attempting to load image:", imageUrl);
+
+                            return (
+                                <section
+                                    //  ${styles.section} section-${idx}
+                                    key={`${img.filename}-${idx}`}
+                                    className={`${styles.hotelDescription} ${idx % 2 === 0 ? styles.leftImage : styles.rightImage}`}
+                                >
+                                    <img
+                                        src={imageUrl}
+                                        alt={img.description || img.category || 'Hotel image'}
+                                        loading="lazy"
+                                    />
+                                    <p>{img.description || 'No description available.'}</p>
+                                </section>
+                            );
+                        })
                 ) : (
-                    <p className="no-images">No hotel images available.</p>
+                    <p className={styles.noImages}>No hotel images available.</p>
                 )}
             </main>
         </>

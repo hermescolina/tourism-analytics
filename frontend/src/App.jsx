@@ -10,9 +10,14 @@ import UploadHistoryImage from './pages/UploadHistoryImage';
 import CarAdmin from './pages/CarAdmin';
 import Car from './pages/Car';
 import BrowseHotels from './components/HotelCards'; // Adjust the path as needed
-console.log('🧠 Imported BrowseHotels:', BrowseHotels);
 import CarCards from "./components/CarCards";
 import TourCardsAdmin from './components/TourCardsAdmin';
+import CarCardsAdmin from './components/CarCardsAdmin';
+import UserDashboard from './pages/UserDashboard';
+import Login from './pages/Login';
+import BookPage from './pages/BookPage';
+
+
 
 
 
@@ -51,7 +56,17 @@ export default function App() {
 
         <Route path="/car-cards" element={<CarCards />} />
 
+        <Route path="/admin/car-cards" element={<CarCardsAdmin />} />
+
         <Route path="/upload-history/:slug" element={<UploadHistoryImage />} />
+
+        <Route path="/dashboard" element={<UserDashboard />} />
+
+        <Route path="/login" element={<Login />} />
+
+        <Route path="/BookPage" element={<BookPage />} />
+
+
       </Routes>
     </Router>
   );

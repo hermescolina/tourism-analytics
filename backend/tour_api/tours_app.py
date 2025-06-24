@@ -3,11 +3,13 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import mysql.connector
 from dotenv import load_dotenv
+from fb_auto_post import fb_bp
+from fb_auto_post import post_tour_to_facebook_internal
+
 import os
 
 # ✅ Load environment variables from .env.tours
 load_dotenv(dotenv_path=".env.tours")
-load_dotenv(dotenv_path=".env.hotels", override=False)
 
 # ✅ DB config from environment
 db_name = os.getenv("DB_NAME")
@@ -32,12 +34,26 @@ hotels_db_config = {
     "port": 3306
 }
 
+# ✅ One-time reusable connection function
+def get_db_connection():
+    return mysql.connector.connect(**tours_db_config)
+
+
+print("🔥 Connecting to HOTEL DB at:", hotels_db_config["host"])
+print("🧪 HOTEL DB CONFIG:", hotels_db_config)
+
+
 
 app = Flask(__name__)
-CORS(app)
+# 🔧 Enable CORS on all routes starting with /api
+CORS(app, resources={r"/api/*": {"origins": "https://app.tourwise.shop"}})
+
+
 
 # ✅ Upload folder setup
 UPLOAD_FOLDER = 'uploads'
+# UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), 'uploads')
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -53,6 +69,7 @@ def add_tour():
         start_date = request.form['start_date']
         end_date = request.form['end_date']
         available_slots = request.form['available_slots']
+        category_id = request.form.get('category_id')
 
         image = request.files.get('image')
         image_filename = None
@@ -68,21 +85,43 @@ def add_tour():
                 return jsonify({"error": "Slug already exists"}), 400
 
             cursor.execute("""
-                INSERT INTO tours (title, slug, location, price, description, start_date, end_date, available_slots, image)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (title, slug, location, price, description, start_date, end_date, available_slots, image_filename))
+                INSERT INTO tours (title, slug, location, price, description, start_date, end_date, available_slots, image, category_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (title, slug, location, price, description, start_date, end_date, available_slots, image_filename, category_id))
             db.commit()
         db.close()
+
+        # ✅ Auto-post to Facebook
+        try:
+            image_url = f"https://app.tourwise.shop/tourism-analytics/uploads/{image_filename}" if image_filename else ""
+            fb_payload = {
+                "title": title,
+                "description": description,
+                "location": location,
+                "price": price,
+                "slug": slug,
+                "image_url": image_url
+            }
+            post_tour_to_facebook_internal(fb_payload)
+            print("📢 Facebook post created successfully.")
+        except Exception as fb_err:
+            print("⚠️ Facebook post failed:", fb_err)
 
         return jsonify({"message": "Tour added successfully"}), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ✅ Serve uploaded images
+
+
+
+
+# ✅ Serve uploaded images with request logging
 @app.route('/uploads/<filename>')
 def serve_image(filename):
+    print(f"📥 Image requested: {filename}")
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
 
 # ✅ Landing data
 @app.route('/api/landing-data')
@@ -92,7 +131,7 @@ def get_landing_data():
     # Connect to tours DB
     db_tours = mysql.connector.connect(**tours_db_config)
     with db_tours.cursor(dictionary=True) as cursor:
-        cursor.execute("SELECT title, location, price, image, description, slug FROM tours;")
+        cursor.execute("SELECT title, location, price, image, description, slug, start_date, end_date,available_slots  FROM tours;")
         tours = cursor.fetchall()
 
     db_tours.close()
@@ -100,9 +139,25 @@ def get_landing_data():
     # Process tours
     processed_tours = []
     for tour in tours:
-        image_path = tour['image'].lstrip("/") if tour['image'] else ""
-        tour['image'] = f"/uploads/{image_path}" if not "images/" in image_path else f"/{image_path}"
+        raw_image = tour.get('image', '').lstrip("/")
+        
+        # If it starts with 'uploads/' → keep as is
+        if raw_image.startswith("uploads/"):
+            tour['image'] = f"/{raw_image}"
+        # If it starts with 'images/' → keep as is
+        elif raw_image.startswith("images/"):
+            tour['image'] = f"/{raw_image}"
+        # Else assume upload path and prepend it
+        elif raw_image:
+            tour['image'] = f"/uploads/{raw_image}"
+        else:
+            tour['image'] = ""
+
+        tour['start_date'] = str(tour['start_date']) if tour.get('start_date') else None
+        tour['end_date'] = str(tour['end_date']) if tour.get('end_date') else None
+        
         processed_tours.append(tour)
+
 
     # Connect to hotels DB
     db_hotels = mysql.connector.connect(**hotels_db_config)
@@ -161,7 +216,7 @@ def get_tour_by_slug(slug):
 
             # 🎬 Get related tour videos
             cursor.execute("""
-                SELECT video_id, caption
+                SELECT video_id, caption, category
                 FROM tour_videos
                 WHERE tour_id = %s
                 ORDER BY created_at DESC
@@ -189,6 +244,7 @@ def update_tour(slug):
         start_date = request.form['start_date']
         end_date = request.form['end_date']
         available_slots = request.form['available_slots']
+        category_id = request.form['category_id']  # ✅ new field
 
         image = request.files.get('image')
         image_filename = None
@@ -201,15 +257,15 @@ def update_tour(slug):
 
                 cursor.execute("""
                     UPDATE tours SET title=%s, location=%s, price=%s, description=%s,
-                        start_date=%s, end_date=%s, available_slots=%s, image=%s
+                        start_date=%s, end_date=%s, available_slots=%s, category_id=%s, image=%s
                     WHERE slug=%s
-                """, (title, location, price, description, start_date, end_date, available_slots, image_filename, slug))
+                """, (title, location, price, description, start_date, end_date, available_slots, category_id, image_filename, slug))
             else:
                 cursor.execute("""
                     UPDATE tours SET title=%s, location=%s, price=%s, description=%s,
-                        start_date=%s, end_date=%s, available_slots=%s
+                        start_date=%s, end_date=%s, available_slots=%s, category_id=%s
                     WHERE slug=%s
-                """, (title, location, price, description, start_date, end_date, available_slots, slug))
+                """, (title, location, price, description, start_date, end_date, available_slots, category_id, slug))
 
             db.commit()
 
@@ -218,6 +274,7 @@ def update_tour(slug):
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
 
 @app.route('/api/tours/<slug>/history-image', methods=['POST'])
 def upload_history_image(slug):
@@ -312,40 +369,6 @@ def get_history_images(slug):
     return jsonify(images)
 
 
-# # @app.route('/api/tours/<slug>/embed-video', methods=['POST'])
-# @app.route('/api/tours/<slug>/save-video', methods=['POST', 'OPTIONS'])
-
-# def save_video_embed(slug):
-#     try:
-#         video_id = request.form.get('video_id')  # ex: i1a5eIxsHgY
-#         caption = request.form.get('caption', '')
-
-#         if not video_id:
-#             return jsonify({"error": "Video ID is required"}), 400
-
-#         db = mysql.connector.connect(**tours_db_config)
-#         with db.cursor() as cursor:
-#             cursor.execute("SELECT id FROM tours WHERE slug = %s", (slug,))
-#             result = cursor.fetchone()
-#             if not result:
-#                 return jsonify({"error": "Tour not found"}), 404
-#             tour_id = result[0]
-
-#             cursor.execute("""
-#                 INSERT INTO tour_videos (tour_id, video_id, caption)
-#                 VALUES (%s, %s, %s)
-#             """, (tour_id, video_id, caption))
-
-#             db.commit()
-#         db.close()
-
-#         return jsonify({"message": "Video embed saved successfully."}), 201
-
-#     except Exception as e:
-#         print("❌ Error in save_video_embed:", e)
-#         return jsonify({"error": str(e)}), 500
-
-
 @app.route('/api/tours/<slug>/save-video', methods=['POST', 'OPTIONS'])
 def save_video_embed(slug):
     try:
@@ -353,6 +376,7 @@ def save_video_embed(slug):
 
         video_id = request.form.get('video_id')  # ex: i1a5eIxsHgY
         caption = request.form.get('caption', '')
+        category = request.form.get('category', '')
 
         print(f"🎬 Received video_id: '{video_id}'")
         print(f"📝 Received caption: '{caption}'")
@@ -376,9 +400,9 @@ def save_video_embed(slug):
 
             print("💾 Inserting video into tour_videos table...")
             cursor.execute("""
-                INSERT INTO tour_videos (tour_id, video_id, caption)
-                VALUES (%s, %s, %s)
-            """, (tour_id, video_id, caption))
+                INSERT INTO tour_videos (tour_id, video_id, caption, category)
+                VALUES (%s, %s, %s, %s)
+            """, (tour_id, video_id, caption, category))
             db.commit()
             print("✅ Video inserted successfully.")
 
@@ -465,14 +489,21 @@ def delete_history_image_by_slug(slug, image_id):
 def update_tour_video(slug, video_id):
     try:
         caption = request.form.get('caption')
+        category = request.form.get('category')
         if not caption:
             return jsonify({"error": "Caption is required"}), 400
+        
+        if not category:
+            return jsonify({"error": "category is required"}), 400
 
         db = mysql.connector.connect(**tours_db_config)
         with db.cursor() as cursor:
             cursor.execute("""
-                UPDATE tour_videos SET caption = %s WHERE id = %s
-            """, (caption, video_id))
+                UPDATE tour_videos
+                SET caption = %s, category = %s
+                WHERE id = %s
+            """, (caption, category, video_id))
+
             db.commit()
 
         db.close()
@@ -515,6 +546,151 @@ def get_tour_history_images(slug):
         print("🔥 Error in get_tour_history_images:", e)
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/bookings/user/<int:user_id>', methods=['GET'])
+def get_user_bookings(user_id):
+    try:
+        db = mysql.connector.connect(**tours_db_config)
+        cursor = db.cursor(dictionary=True)
+
+        query = """
+            SELECT 
+                b.id,
+                b.status,
+                b.booking_date,
+                b.num_guests,
+                b.hotel_booked,
+                b.car_rented,
+                t.title AS tour_title
+            FROM bookings b
+            JOIN tours t ON b.tour_id = t.id
+            WHERE b.user_id = %s
+            ORDER BY b.booking_date DESC
+        """
+        cursor.execute(query, (user_id,))
+        bookings = cursor.fetchall()
+        db.close()
+
+        return jsonify(bookings)
+
+    except Exception as e:
+        print("❌ Error in get_user_bookings:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/users/<int:user_id>', methods=['GET'])
+def get_user_by_id(user_id):
+    try:
+        db = mysql.connector.connect(**tours_db_config)
+        cursor = db.cursor(dictionary=True)
+
+        query = """
+            SELECT 
+                id, full_name, email, phone, location, created_at 
+            FROM users
+            WHERE id = %s
+        """
+        cursor.execute(query, (user_id,))
+        user = cursor.fetchone()
+
+        db.close()
+
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+
+        return jsonify(user)
+
+    except Exception as e:
+        print("❌ Error in get_user_by_id:", e)
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/users/login', methods=['POST'])
+def login_user():
+    data = request.get_json()
+    email = data.get('email')
+    # password = data.get('password') ← ignore for now
+
+    db = mysql.connector.connect(**tours_db_config)
+    cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT id, full_name, email FROM users WHERE email = %s", (email,))
+    user = cursor.fetchone()
+    db.close()
+
+    if user:
+        return jsonify(user)
+    else:
+        return jsonify({'error': 'Invalid email'}), 401
+
+@app.route('/api/categories', methods=['GET'])
+def get_categories():
+    try:
+        db = mysql.connector.connect(**tours_db_config)
+        with db.cursor(dictionary=True) as cursor:
+            cursor.execute("SELECT id, name FROM categories ORDER BY name ASC")
+            categories = cursor.fetchall()
+        db.close()
+        return jsonify(categories)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/book-tour', methods=['POST'])
+def create_booking():
+    data = request.get_json()
+
+    name = data['name']
+    email = data['email']
+    phone = data['phone']
+    whatsapp = data.get('whatsapp', '')
+    tour_id = data['tour_id']
+    hotel_id = data.get('hotel_id')
+    car_id = data.get('car_id')
+    date = data['date']
+    num_guests = data.get('num_guests', 1)
+
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+
+    # Check if customer exists by email
+    cursor.execute("SELECT id FROM customers WHERE email = %s", (email,))
+    existing = cursor.fetchone()
+    print("🔍 Existing customer check result:", existing)
+
+    if existing:
+        customer_id = existing['id']
+        print(f"✅ Customer exists with ID: {customer_id}")
+    else:
+        cursor.execute(
+            "INSERT INTO customers (name, email, phone, whatsapp) VALUES (%s, %s, %s, %s)",
+            (name, email, phone, whatsapp)
+        )
+        customer_id = cursor.lastrowid
+
+    # ✅ Insert booking (FIXED line: comment added instead of invalid syntax)
+    cursor.execute(
+        """
+        INSERT INTO bookings (user_id, tour_id, booking_date, num_guests, status, hotel_id, car_id)
+        VALUES (%s, %s, %s, %s, 'pending', %s, %s)
+        """,
+        (customer_id, tour_id, date, num_guests, hotel_id, car_id)
+    )
+
+    db.commit()
+    return jsonify({"message": "Booking created with customer info"}), 201
+
+
+
+@app.route('/api/tour-titles', methods=['GET'])
+def get_tour_titles():
+    db = get_db_connection()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT id, title, price, slug FROM tours")
+    results = cursor.fetchall()
+    return jsonify(results)
+
+
+app.register_blueprint(fb_bp, url_prefix='/api/fb') 
 
 # ✅ Run locally or with Gunicorn/Render
 if __name__ == '__main__':
@@ -524,3 +700,5 @@ if __name__ == '__main__':
         print(f"{rule} → {', '.join(rule.methods)}")
 
     app.run(host='0.0.0.0', port=port)
+    
+

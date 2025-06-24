@@ -11,14 +11,14 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # ✅ Load environment variables
-load_dotenv()
+load_dotenv(dotenv_path=".env.hotels")
 
 # ✅ DB config from .env
 db_config = {
-    "host": os.getenv("DB_HOST"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASS"),
-    "database": os.getenv("DB_NAME")
+    "host": os.getenv("HOTEL_DB_HOST"),
+    "user": os.getenv("HOTEL_DB_USER"),
+    "password": os.getenv("HOTEL_DB_PASS"),
+    "database": os.getenv("HOTEL_DB_NAME")
 }
 
 app = Flask(__name__)

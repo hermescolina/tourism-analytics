@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { apiBaseTour, apiBaseHotel, apiBaseCar } from '../config';
 import React, { useState, useEffect } from 'react';
-import './TourCards.css';
+import styles from './TourCards.module.css';
 
 const base = '/tourism-analytics';
 
@@ -16,8 +17,7 @@ export default function BrowseTours() {
   const safeMaxPrice = Number(maxPrice) || 999999;
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/landing-data')
-      //fetch('https://tourism-analytics.onrender.com/api/landing-data')
+    fetch(`${apiBaseTour}/api/landing-data`)
       .then(async res => {
         const text = await res.text();
         console.log("📦 Raw response text from API:", text);
@@ -63,23 +63,35 @@ export default function BrowseTours() {
 
   console.log("🖼️ image path:", `${base}/images/tourwise.png`);
 
+
+  useEffect(() => {
+    fetch(`${apiBaseTour}/api/landing-data`)
+      .then(res => res.json())
+      .then(data => {
+        setTours(data.topTours || []);
+        console.log("🎯 Tour Dates Check:", data.topTours.map(t => [t.title, t.start_date, t.end_date]));
+      });
+  }, []);
+
+
   return (
-    <div className="browse-container">
-      <header className="browse-header">
-        <div className="logo-section">
+    <div className={styles.browseContainer}>
+      <header className={styles.browseHeader}>
+        <div className={styles.logoSection}>
           <Link to="/">
-            <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className="logo-image" />
+            <img src={`${base}/images/tourwise.png`} alt="TourWise Logo" className={styles.logoImage} />
           </Link>
           <Link to="/">
-            <span className="logo-text">TourWise</span>
+            <span className={styles.logoText}>TourWise</span>
           </Link>
         </div>
-        <h1 className="browse-title-inline">Browse Tours</h1>
-        <div className="search-bar-wrapper">
+        <div>    </div>
+        {/* <h1 className={styles.browseTitleInline}>Browse Tours</h1> */}
+        <div className={styles.searchBarWrapper}>
           <input
             type="text"
             placeholder="🔍 Search tours"
-            className="search-bar"
+            className={styles.searchBar}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onFocus={() => setLocationFilter('')}
@@ -87,19 +99,15 @@ export default function BrowseTours() {
         </div>
       </header>
 
+      <div className={styles.browseWrapper}>
+        <aside className={styles.filterPanel}>
+          <h2 className={styles.filterTitle}>Filters</h2>
 
-
-
-
-      <div className="browse-wrapper">
-        <aside className="filter-panel">
-          <h2 className="filter-title">Filters</h2>
-
-          <div className="filter-group">
-            <label className="filter-label">Location</label>
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Location</label>
             <input
               type="text"
-              className="filter-input"
+              className={styles.filterInput}
               placeholder="Enter location"
               value={locationFilter}
               onChange={(e) => setLocationFilter(e.target.value)}
@@ -107,15 +115,15 @@ export default function BrowseTours() {
             />
           </div>
 
-          <div className="filter-group">
-            <label className="filter-label">Price Range</label>
-            <div className="price-range-inputs">
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Price Range</label>
+            <div className={styles.priceRangeInputs}>
               <input
                 type="number"
                 min="0"
                 value={minPrice}
                 onChange={(e) => setMinPrice(Number(e.target.value))}
-                className="price-input"
+                className={styles.priceInput}
                 placeholder="Min"
               />
               <span>to</span>
@@ -124,7 +132,7 @@ export default function BrowseTours() {
                 min={minPrice}
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
-                className="price-input"
+                className={styles.priceInput}
                 placeholder="Max"
               />
             </div>
@@ -134,16 +142,16 @@ export default function BrowseTours() {
               max="100000"
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="filter-range"
+              className={styles.filterRange}
             />
-            <p className="price-display">
+            <p className={styles.priceDisplay}>
               ₱ {minPrice.toLocaleString()} – ₱ {maxPrice.toLocaleString()}
             </p>
           </div>
 
-          <div className="filter-group">
-            <label className="filter-label">Rating</label>
-            <div className="filter-stars">
+          <div className={styles.filterGroup}>
+            <label className={styles.filterLabel}>Rating</label>
+            <div className={styles.filterStars}>
               {[1, 2, 3, 4, 5].map(star => (
                 <span key={star}>★</span>
               ))}
@@ -151,48 +159,52 @@ export default function BrowseTours() {
           </div>
         </aside>
 
-        <div className="browse-content">
-          <div className="tour-grid">
+        <div className={styles.browseContent}>
+          <div className={styles.tourGrid}>
             {filteredTours.map((tour, index) => (
               <div
                 key={index}
-                className="tour-card"
+                className={styles.tourCard}
                 onClick={() => handleCardClick(tour)}
               >
                 <img
                   src={tour.image.includes('uploads')
-                    ? `http://localhost:3001/${tour.image}`
+                    ? `${apiBaseTour}/${tour.image}`
                     : `${base}${tour.image}`}
                   alt={tour.title}
-                  className="tour-card-image"
+                  className={styles.tourCardImage}
                 />
 
-                <div className="tour-card-details">
-                  <h3 className="tour-title">{tour.title}</h3>
-                  <p className="tour-description">{tour.description}</p>
-                  <p className="tour-price">₱ {Number(tour.price).toLocaleString()}</p>
-                  <p className="tour-slots">🎟️ {tour.available_slots} slots available</p>
-                  <p className="tour-dates">
-
-
-                    📅 {new Date(tour.start_date).toLocaleDateString('en-PH', {
-                      weekday: 'short',
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric'
-                    })} – {new Date(tour.end_date).toLocaleDateString('en-PH', {
-                      weekday: 'short',
-                      day: 'numeric',
-                      month: 'short',
-                      year: 'numeric'
-                    })}
+                <div className={styles.tourCardDetails}>
+                  <h3 className={styles.tourTitle}>{tour.title}</h3>
+                  <p className={styles.tourDescription}>{tour.description}</p>
+                  <p className={styles.tourPrice}>₱ {Number(tour.price).toLocaleString()}</p>
+                  <p className={styles.tourSlots}>🎟️ {tour.available_slots} slots available</p>
+                  <p className={styles.tourDates}>
+                    📅 {tour.start_date && tour.end_date ? (
+                      <>
+                        {new Date(tour.start_date).toLocaleDateString('en-PH', {
+                          weekday: 'short',
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })} –{' '}
+                        {new Date(tour.end_date).toLocaleDateString('en-PH', {
+                          weekday: 'short',
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                      </>
+                    ) : 'Date not set'}
                   </p>
+
 
                 </div>
               </div>
             ))}
             {filteredTours.length === 0 && (
-              <p className="no-results-message">No matching tours found.</p>
+              <p className={styles.noResultsMessage}>No matching tours found.</p>
             )}
           </div>
         </div>
