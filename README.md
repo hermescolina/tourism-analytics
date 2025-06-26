@@ -4,9 +4,6 @@
 
 🔗 **Live Site:** [https://app.tourwise.shop/tourism-analytics/](https://app.tourwise.shop/tourism-analytics/)
 
-🔗 **Live Site:** [https://hermescolina.github.io/tourism-analytics/](https://hermescolina.github.io/tourism-analytics/)
-
-
 ---
 
 ## 🧱 Project Structure
