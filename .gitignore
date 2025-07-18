@@ -1,0 +1,30 @@
+# Node & Environment
+node_modules/
+frontend/node_modules/
+.env
+.env*
+
+# Build Outputs
+frontend/dist/
+*.tar.gz
+
+# Backup & Archive Files
+/archive/
+/backup/
+*-bak*/
+*.bak/
+*copy*
+frontend.bak
+frontend.bak02/
+
+# Git tools
+git-filter-repo/
+
+# Optional: ignore SQL and YAML files if not versioned
+*.sql
+# *.yml
+*.yaml
+
+
+*.sh
+*.txt

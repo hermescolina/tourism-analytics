@@ -1,0 +1,109 @@
+.adminContainer {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: auto;
+    font-family: sans-serif;
+}
+
+.adminContainer h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.statusMessage {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: green;
+    font-weight: bold;
+}
+
+.imageEdit {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: flex-start;
+}
+
+.imageEdit img {
+    width: 200px;
+    height: auto;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.imageEdit textarea {
+    flex: 1;
+    min-height: 100px;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.imageEdit button {
+    margin-top: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.imageEdit button:hover {
+    background-color: #0056b3;
+}
+
+.roomEntry {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #ddd;
+}
+
+.loading {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-top: 5rem;
+}
+
+.uploadForm {
+    border: 1px dashed #aaa;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    background: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 400px;
+}
+
+.uploadForm input[type="file"],
+.uploadForm input[type="text"],
+.uploadForm textarea {
+    width: 100%;
+    padding: 0.4rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.uploadForm textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.uploadForm button {
+    align-self: flex-start;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.uploadForm button:hover {
+    background-color: #0056b3;
+}

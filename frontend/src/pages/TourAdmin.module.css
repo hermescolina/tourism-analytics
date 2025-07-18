@@ -1,0 +1,208 @@
+.topNav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+/* Left section */
+.logoSection {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.logoSection nav {
+    margin-left: clamp(1rem, 80vw, 60rem);
+}
+
+
+.titleBlock {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.logoImage {
+    height: 40px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+    margin: 0;
+}
+
+
+.navTitle {
+    font-size: 1.25rem;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+.subTitle {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+.button {
+    display: inline-block;
+    width: auto;
+    padding: 0.5rem 1rem;
+}
+
+.pageTitleBar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.tourForm {
+    width: 100%;
+}
+
+.tourForm .formGroup {
+    margin-bottom: 1rem;
+}
+
+.formGroup {
+    width: 50%;
+    display: block;
+    margin: 0 auto;
+}
+
+
+.formGroup .button {
+    width: 50%;
+    display: block;
+    margin: 0 auto;
+}
+
+
+
+.browseTitleInline {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-left: 1rem;
+}
+
+.imagePreview {
+    text-align: center;
+}
+
+.imagePreview img {
+    width: 500px;
+    max-width: 100%;
+    height: auto;
+    display: inline-block;
+    border: 1px solid #ccc;
+    padding: 5px;
+    background: #fff;
+}
+
+
+.tourForm {
+    width: 100%;
+}
+
+
+.tourForm textarea {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+    resize: vertical;
+}
+
+
+.tourForm label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.tourForm input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+
+.tourForm button {
+    padding: 0.6rem 1.5rem;
+    font-size: 1rem;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.tourForm button:hover {
+    background-color: #005fa3;
+}
+
+.adminTable {
+    width: 100%;
+    margin-top: 2rem;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.adminTable th,
+.adminTable td {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    word-wrap: break-word;
+}
+
+.adminTable th {
+    border-top: 1px solid #ccc;
+}
+
+.adminTable tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.adminTable tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.adminTable td:nth-child(3),
+.adminTable th:nth-child(3) {
+    text-align: right;
+    min-width: 80px;
+}
+
+.adminTable button {
+    padding: 0.25rem 0.5rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.adminTable button:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+    .logoSection nav {
+        margin-left: 1rem;
+        /* or 2rem, depending on your design */
+    }
+}
+
+@media (max-width: 768px) {
+    .topNav {
+        /* Don't override position here unless absolutely necessary */
+        padding: 0.75rem 1rem;
+    }
+}

@@ -1,0 +1,526 @@
+/* ===========================
+   Global Base & Typography
+=========================== */
+.tourwiseLanding {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #1f2937;
+}
+
+/* ===========================
+   Navbar/Header
+=========================== */
+.navbar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    box-sizing: border-box;
+}
+
+.navbarLogo {
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: #047857;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+}
+
+.navbar nav {
+    display: flex;
+    gap: 1.5rem;
+    margin-right: 1rem;
+}
+
+.navbar nav a {
+    color: #1f2937;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0.7rem;
+    border-radius: 8px;
+    transition: background 0.18s, color 0.18s;
+}
+
+.navbar nav a:last-child {
+    background: #10b981;
+    color: #fff !important;
+    padding: 0.5rem 1.1rem;
+    border-radius: 8px;
+    margin-right: 0.8rem;
+    transition: background 0.15s;
+}
+
+.navbar nav a:last-child:hover {
+    background: #059669;
+    color: #fff !important;
+}
+
+
+/* ===========================
+   External Link Styling
+=========================== */
+.externalLink::after {
+    content: "↗";
+    font-size: 0.8em;
+    margin-left: 0.2em;
+    vertical-align: 10%;
+    opacity: 0.7;
+}
+
+.mobileMenu {
+    position: fixed;
+    left: -70%;
+    top: 0;
+    width: 70%;
+    height: 100vh;
+    background: #333;
+    transition: left 0.3s ease-in-out;
+    z-index: 999;
+}
+
+.mobileMenu.open {
+    left: 0;
+}
+
+.menuToggle {
+    display: block;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #1f2937;
+}
+
+/* ===========================
+   Hero Section
+=========================== */
+.hero {
+    background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)),
+        url('/tourism-analytics/images/landingbackgnd.png') center/cover no-repeat;
+    color: white;
+    padding: 6rem 1rem;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 80vh;
+    background-color: #000;
+    position: relative;
+}
+
+.heroContent h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.heroContent p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+/* Scroll Indicator */
+.scrollIndicator {
+    position: absolute;
+    left: 50%;
+    bottom: 2rem;
+    transform: translateX(-50%);
+    z-index: 2;
+    animation: bounce 2s infinite;
+    font-size: 2.2rem;
+    color: #fff;
+    opacity: 0.75;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateX(-50%) translateY(0);
+    }
+
+    50% {
+        transform: translateX(-50%) translateY(14px);
+    }
+}
+
+/* ===========================
+   Button Styles
+=========================== */
+.btnPrimary {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btnPrimary:hover {
+    background-color: #059669;
+}
+
+
+/* ===========================
+   Cards Layout (Tours & Hotels)
+=========================== */
+.tourCards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+    align-items: stretch;
+}
+
+.tourCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    text-decoration: none;
+    color: inherit;
+    flex: 0 1 calc(33.333% - 1.5rem);
+    max-width: 300px;
+    min-width: 250px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    user-select: none;
+    height: auto !important;
+    overflow: visible;
+}
+
+.tourCard:hover {
+    transform: scale(1.04);
+    box-shadow: 0 8px 28px rgba(30, 136, 229, 0.13), 0 4px 14px rgba(0, 0, 0, 0.09);
+    border: 1.5px solid #a7f3d0;
+}
+
+.tourImage {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    display: block;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.tourInfo {
+    flex-grow: 1;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.tourInfo h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+    color: #065f46;
+}
+
+.tourInfo .description {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin: 0.5rem 0;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    flex-grow: 1;
+}
+
+.tourInfo .location {
+    font-weight: 500;
+    color: #4b5563;
+}
+
+.tourInfo .price {
+    font-weight: bold;
+    color: #111827;
+}
+
+/* ===========================
+   Stats Bar
+=========================== */
+.statsBar {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    background: #f9fafb;
+    padding: 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 2rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* ===========================
+   Tips Grid
+=========================== */
+.tipsGrid {
+    max-width: 960px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .tipsGrid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ===========================
+   Testimonials Section
+=========================== */
+.testimonials {
+    background: #e0f2fe;
+    padding: 2.5rem 1.5rem;
+    border-radius: 1rem;
+    margin: 2rem auto;
+    max-width: 900px;
+}
+
+.testimonialsGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 600px) {
+    .testimonialsGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.testimonials blockquote {
+    background: #fff;
+    border-left: 4px solid #38bdf8;
+    margin: 0;
+    padding: 1rem 1.5rem;
+    border-radius: 0.7rem;
+    font-style: italic;
+    color: #374151;
+}
+
+.testimonials footer {
+    margin-top: 1rem;
+    text-align: right;
+    color: #0e7490;
+    font-size: 0.97rem;
+    font-style: normal;
+}
+
+/* ===========================
+   Footer
+=========================== */
+.footer {
+    background: #111827;
+    color: #f3f4f6;
+    text-align: center;
+    padding: 1.7rem 0;
+    margin-top: 2rem;
+    font-size: 1rem;
+    border-radius: 1.5rem 1.5rem 0 0;
+}
+
+.footer a {
+    color: #10b981;
+    margin: 0 0.5rem;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* ===========================
+   Language Banner
+=========================== */
+.languageBanner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #5b4ce0;
+    color: white;
+    padding: 1rem;
+    gap: 1rem;
+    font-size: 1rem;
+    flex-wrap: wrap;
+}
+
+.languageBanner select,
+.languageBanner button {
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 1rem;
+}
+
+.languageBanner select {
+    background-color: #fff;
+    color: #333;
+}
+
+.languageBanner button {
+    background-color: white;
+    color: #5b4ce0;
+    cursor: pointer;
+}
+
+.languageBanner button:last-child {
+    background: transparent;
+    border: 1px solid white;
+    color: white;
+}
+
+.dropdown {
+    margin-left: auto;
+    /* Pushes it to the far right inside the flex container */
+    transform: translateX(15px);
+    /* Shifts the element 15px more to the right */
+    position: relative;
+    padding: 0.5rem 20.2rem 0.5rem 0rem;
+    padding-right: 1rem;
+    /* border: solid 1px #500606; */
+    display: flex;
+    /* Required for justify-content to work */
+    justify-content: flex-end;
+    /* Optional: centers inner content horizontally */
+    align-items: center;
+    /* Optional: centers inner content vertically */
+    box-sizing: border-box;
+}
+
+
+
+.dropdownToggle {
+    margin-right: 200px;
+    position: absolute;
+    background: white;
+    border: 1px solid #f1ecec;
+    padding: 0.4rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 6px;
+    display: flex;
+    /* Required for justify-content to work */
+    justify-content: center;
+    /* Optional: centers inner content horizontally */
+    align-items: center;
+    /* Optional: centers inner content vertically */
+}
+
+.dropdownMenu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    padding: 0.75rem 2rem;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-width: 240px;
+    z-index: 999;
+}
+
+
+.dropdownMenu a {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 2rem;
+    text-decoration: none;
+    color: #1f2937;
+    font-size: 0.95rem;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+}
+
+.dropdownMenu a i {
+    margin-right: 0.5rem;
+    min-width: 1.25rem;
+    text-align: center;
+    line-height: 1;
+}
+
+
+.dropdownMenu a:hover {
+    background-color: #f3f4f6;
+}
+
+/* Responsive Navbar */
+@media (max-width: 700px) {
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0.6rem 1rem;
+    }
+
+    .navbar nav {
+        gap: 1rem;
+        width: 100%;
+    }
+
+    .navbarLogo {
+        margin-bottom: 0.6rem;
+    }
+}
+
+
+
+/* Responsive Tips Padding */
+@media (max-width: 768px) {
+    .sectionTips {
+        padding-left: 1.5rem;
+    }
+}
+
+@media (min-width: 769px) {
+    .sectionTips {
+        padding-left: 16rem;
+    }
+}
+
+@media (max-width: 700px) {
+    .statsBar {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+}
+
+
+/* ===========================
+   Section Layout
+=========================== */
+.sectionFeatured,
+.sectionTips {
+    padding: 3rem 1.5rem;
+}
+
+.sectionTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}

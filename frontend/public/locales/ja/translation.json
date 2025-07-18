@@ -1,0 +1,14 @@
+{
+  "test_message": "i18nextからこんにちは！",
+  "welcome_text": "素晴らしいツアーとホテルを見つけよう",
+  "book_now": "今すぐ予約",
+  "share": "共有する",
+  "contact_guide": "ガイドに連絡",
+  "tips_for_visitors": "訪問者へのヒント",
+  "loading": "読み込み中...",
+  "not_found": "ツアーが見つからないか、サーバーエラーです。",
+  "about_tour": "ツアーについて",
+  "what_to_expect": "期待できること",
+  "history_and_culture": "歴史と文化"
+}
+

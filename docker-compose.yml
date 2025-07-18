@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./backend/tour_api/.env.tours
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+
+  tour_api:
+    build:
+      context: ./backend/tour_api
+    container_name: flask_tour_api
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend/tour_api:/app
+      - ./backend/uploads:/app/uploads
+    working_dir: /app
+    env_file:
+      - ./backend/tour_api/.env.tours
+    extra_hosts:
+      - "host.docker.internal:192.168.44.221"
+    environment:
+      FLASK_APP: tours_app.py
+      FLASK_ENV: development
+    command: flask run --host=0.0.0.0 --port=3001
+
+  hotel_api:
+    build:
+      context: ./backend/hotel_api
+    container_name: flask_hotel_api
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend/hotel_api:/app
+    working_dir: /app
+    env_file:
+      - ./backend/hotel_api/.env.hotels
+    environment:
+      FLASK_APP: hotel_app.py
+      FLASK_ENV: development
+    command: flask run --host=0.0.0.0 --port=5000
+
+  car_api:
+    build:
+      context: ./backend/car_api
+    container_name: flask_car_api
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./backend/car_api:/app
+    working_dir: /app
+    env_file:
+      - ./backend/car_api/.env.cars
+    environment:
+      FLASK_APP: car_app.py
+      FLASK_ENV: development
+    command: flask run --host=0.0.0.0 --port=5001
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: vite_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+    working_dir: /app
+    command: [ "npm", "run", "dev" ]
+
+volumes:
+  db_data:

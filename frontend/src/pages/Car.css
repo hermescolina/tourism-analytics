@@ -1,0 +1,203 @@
+.car-header {
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    color: white;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.car-header.scrolled {
+    height: 80px;
+    background: white;
+    color: black;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.car-header.scrolled .menu-bar,
+.car-header.scrolled .action-bar,
+.car-header.scrolled .logo-title,
+.car-header.scrolled .logo-subtitle,
+.car-header.scrolled .divider,
+.car-header.scrolled .menu-icon,
+.car-header.scrolled .menu-label {
+    color: black;
+}
+
+.car-header.scrolled .tagline {
+    display: none;
+}
+
+.header-content {
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6rem;
+    text-align: center;
+    width: 100%;
+    max-width: 900px;
+    position: absolute;
+    top: 7%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    transition: all 0.3s ease;
+    padding-left: 0;
+    /* Remove if you want it truly flush left */
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo-image {
+    height: 32px;
+    width: auto;
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #15803d;
+}
+
+
+
+.menu-bar,
+.action-bar {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    color: white;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.divider {
+    color: white;
+    opacity: 0.6;
+}
+
+.reserve-btn {
+    padding: 0.5rem 1.2rem;
+    background: white;
+    color: black;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.reserve-btn:hover {
+    background: #a07b49;
+}
+
+.action-bar a,
+.action-bar span,
+.action-bar button {
+    display: flex;
+    align-items: center;
+}
+
+.action-bar a {
+    color: white;
+    background: transparent;
+    text-decoration: none;
+    outline: none;
+}
+
+.action-bar a:focus,
+.action-bar a:hover,
+.action-bar a:active {
+    color: #ccc;
+    background: transparent;
+    outline: none;
+    text-decoration: underline;
+}
+
+.logo-title {
+    font-size: clamp(0.5rem, 6vw, 1.5rem);
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    white-space: nowrap;
+    padding-left: 18rem;
+    padding-right: 8rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.logo-subtitle {
+    font-size: 1.2rem;
+    letter-spacing: 4px;
+    padding-left: 18rem;
+    padding-right: 8rem;
+}
+
+.tagline {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 3rem;
+    text-align: center;
+    z-index: 1;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    transition: opacity 0.3s ease;
+}
+
+/* Shared section base */
+.car-description {
+    background: white;
+    color: #222;
+    padding: 4rem 2rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    text-align: justify;
+    overflow: hidden;
+}
+
+.car-description img {
+    float: left;
+    max-width: 300px;
+    height: auto;
+    margin-right: 2rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+}
+
+.first-section {
+    margin-top: 0;
+    clear: both;
+}
+
+.second-section {
+    margin-top: -3rem;
+    clear: both;
+}
+
+.third-section,
+.fourth-section,
+.fifth-section,
+.sixth-section {
+    margin-top: -3rem;
+    clear: both;
+}

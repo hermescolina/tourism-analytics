@@ -1,0 +1,836 @@
+[33mcommit 862636b5c9401d39652849c5718f1d0d8244375f[m[33m ([m[1;36mHEAD -> [m[1;32mtest-gpg-signed-clean[m[33m, [m[1;31morigin/test-gpg-signed-clean[m[33m)[m
+[36mgpg: Signature made Fri Jul 18 21:14:06 2025 CST[m
+[36mgpg:                using RSA key 3A1310E0029963265527A603B71FD3E39A4DC349[m
+[36mgpg: Good signature from "HermesColina" [ultimate][m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri Jul 18 20:56:41 2025 +0800
+
+    Test: verify signed commit
+
+[33mcommit 41875aecdd2887f6b5693dcd3a0ef4da4f565294[m[33m ([m[1;31morigin/dev[m[33m, [m[1;32mfeature/xyz[m[33m, [m[1;32mdev[m[33m)[m
+[36mgpg: Signature made Fri Jul 18 20:50:27 2025 CST[m
+[36mgpg:                using RSA key 3A1310E0029963265527A603B71FD3E39A4DC349[m
+[36mgpg: Good signature from "HermesColina" [ultimate][m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri Jul 18 20:50:27 2025 +0800
+
+    Add deploy job for staging environment
+
+[33mcommit 72a4d248016c51bdd5b23af6bc11a4af0443dfa3[m
+[36mgpg: Signature made Fri Jul 18 20:44:03 2025 CST[m
+[36mgpg:                using RSA key 3A1310E0029963265527A603B71FD3E39A4DC349[m
+[36mgpg: Good signature from "HermesColina" [ultimate][m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri Jul 18 20:23:40 2025 +0800
+
+    Add deploy job to satisfy staging environment check
+
+[33mcommit 167f929af2b3e5d3f652e545bae204f50bf97a70[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri Jul 18 20:20:08 2025 +0800
+
+    Add deploy job to satisfy staging environment check
+
+[33mcommit 56eadfdc3454fdf048f16bf92cbc1aee5956f3b3[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri Jul 18 19:50:41 2025 +0800
+
+    Updating Tourpage, and TourLanding
+
+[33mcommit 030bf1a64a51de151f7cabdf31b30d329b30bccc[m[33m ([m[1;32mstaging[m[33m)[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri Jul 18 02:49:16 2025 +0800
+
+    Booking routes update
+
+[33mcommit 26d9b8ff781c201fa7571342a1fbcea0da7f12ae[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 17:21:41 2025 +0800
+
+    Fix: ensure flake8 is installed in CI
+
+[33mcommit 24181cf7755e7a64c52adb1edbd3c31d89d54d93[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 17:17:37 2025 +0800
+
+    Fix CI: make pip installs non-blocking
+
+[33mcommit e555b0db5ba244e8998f617d850248d7919b17b6[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 17:15:26 2025 +0800
+
+    Ensure CI no longer references backend/requirements.txt
+
+[33mcommit f4ec5f7434d7e15abbafa8ec85a9fdf8440be801[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 17:11:18 2025 +0800
+
+    WIP: Update backend and frontend components
+
+[33mcommit 6d10012527b8de4f034a4751d9b0e3e3a6d86fab[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 17:05:13 2025 +0800
+
+    ci: test full backend/frontend lint & test with pip cache
+
+[33mcommit a476778571710c30023adefa02d6b46b4209ffab[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 16:32:42 2025 +0800
+
+    test(ci): force trigger on dev
+
+[33mcommit 5f233fd359ead43b67d59e1546b8cf396f9c3853[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 16:22:57 2025 +0800
+
+    ci: connect backend and frontend jobs to staging environment
+
+[33mcommit 05aec02356291e7f8777b2fb51e23d02dc2f9f6a[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 16:18:00 2025 +0800
+
+    test(ci): trigger build-and-test on staging
+
+[33mcommit bb5a588366573d7771325055acafc16c5b4a9e11[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 15:46:16 2025 +0800
+
+    WIP: prepping to sync debug-branch
+
+[33mcommit 1e872812670cacecc6cde383e7f821d336d441a9[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 15:42:00 2025 +0800
+
+    Ignore .sh and .txt files and clean Git cache
+
+[33mcommit 07ba70ce0d44fb0fe140fd040fd55b59a4ab585c[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 15:35:12 2025 +0800
+
+    Cleaned up code, updated .gitignore, ready for backup
+
+[33mcommit 95f8cefe33b1f19a2c42d520851fd45186ed1efe[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 08:38:47 2025 +0800
+
+    Future addons update
+
+[33mcommit 405c903f6c7205318183b3272d3e710ea19bb488[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 02:36:17 2025 +0800
+
+    Remove .yml, .sql, .sh, and .txt files from staging branch and update .gitignore
+
+[33mcommit ee39f22e6885b1842a72c04f0594b25a675bbac6[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 02:14:26 2025 +0800
+
+    Remove MySQL backup file from repo and update .gitignore
+
+[33mcommit 342137d02c009ff3036239bdc3bd98f83a75885b[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 02:09:58 2025 +0800
+
+    Fix: resolved circular import, added get_db_connection, updated imports
+
+[33mcommit 259e769aed3b749803230d16e84c8fc122c60f5a[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 01:55:01 2025 +0800
+
+    Set up Jest, fixed ESLint errors, and added test for App
+
+[33mcommit 17d5e54f746888e83c568bc45f018c8fc9120036[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 00:55:38 2025 +0800
+
+    Fix lint errors, clean up unused variables and imports
+
+[33mcommit 8845f7d7e72dbe7cde13cbae0239ae2ccc76c5fe[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 00:50:04 2025 +0800
+
+    Refactor code, clean up TourPage, fix lint and style issues
+
+[33mcommit 75e428bab6f0945b4e15f04b79f9e370fd5808ad[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 00:04:22 2025 +0800
+
+    Fix lint errors, clean structure, remove unused files
+
+[33mcommit 6863d346c127f6b038a6f2d32bf6f36eb1095bb0[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu Jul 17 00:00:45 2025 +0800
+
+    Update gitignore
+
+[33mcommit a27e5625413d22acd46ce26744605aebc300bcc3[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 23:58:18 2025 +0800
+
+    Cleaned up TourPage, removed unused files, updated logic
+
+[33mcommit 04dc8219721fbb3c1105186edf03038aa518ccdc[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 17:02:27 2025 +0800
+
+    Add placeholder npm test script
+
+[33mcommit 9add9a14eb2306452b91c9554e30eca89b4b4c48[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 17:00:25 2025 +0800
+
+    Add basic sanity test for CI
+
+[33mcommit 6a3a28585354dd19beb5267424e03bec9b68ae6a[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 16:55:08 2025 +0800
+
+    Fix: correct MySQL connection using .env.tours and update DB config
+
+[33mcommit 7535c0f4fc67069a210904270c716fd4c8d3fcdc[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 16:36:38 2025 +0800
+
+    Refactor: apply flake8 and black formatting, add .flake8 config
+
+[33mcommit 8c1b0b7d168d4e7b24a2097320ce141fbf953e96[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 16:02:52 2025 +0800
+
+    Fix: Auto-fixed lint issues
+
+[33mcommit 784796e867fc61defe3b1df30bb42527106a107b[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 15:40:16 2025 +0800
+
+    Update config files, packages, and backend
+
+[33mcommit 1c29c42e9512f47a67d8f893e96290874961a167[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 14:35:29 2025 +0800
+
+    Add CI workflow for backend and frontend lint + test
+
+[33mcommit 78237e239fc3f6de42279aa2ce49c2fd9bccc101[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 14:21:00 2025 +0800
+
+    Final fix: add correct ci.yml to tracked files
+
+[33mcommit b82749eaa9c23185374e0c6aa773d37c6b48ba35[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 14:20:39 2025 +0800
+
+    Final fix: add correct ci.yml to tracked files
+
+[33mcommit 1f6988237ab89ede21eeb18fd27d959579849d6c[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 14:17:18 2025 +0800
+
+    Fix YAML indentation in CI workflow again
+
+[33mcommit eeecc2a4b327937d74fcb6cc8d0b41002a340672[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 14:16:01 2025 +0800
+
+    Fix YAML indentation in CI workflow
+
+[33mcommit 9fb0f01b391b2f864835ec88ba55e8ce32ce67d3[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 14:07:46 2025 +0800
+
+    Fix YAML indentation in CI workflow
+
+[33mcommit a04ad8ddb65431476310a33c8729d2cc4f2c4277[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 14:04:12 2025 +0800
+
+    Fix indentation for frontend job in CI workflow
+
+[33mcommit 17b739a7a1d0f049346e2fb6720d80e7454acb06[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 13:55:16 2025 +0800
+
+    Force add CI workflow file
+
+[33mcommit f8358848835dab91cf5403301dba627059c558ca[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 12:54:17 2025 +0800
+
+    Untrack __pycache__ folders and update .gitignore
+
+[33mcommit 6f9461cbb97e36cc37a517b66faedc8dd72b996b[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 12:52:46 2025 +0800
+
+    Update .gitignore to ignore node_modules
+
+[33mcommit 6a14d68ec9ba529eac2fb119f446ebaba559253b[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 12:48:13 2025 +0800
+
+    Untrack files with 'copy' in the name and update .gitignore
+
+[33mcommit af13f7fac06cfa144da487bd1330cfeb9c41eb43[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 12:46:14 2025 +0800
+
+    Remove all files with 'copy' in the filename
+
+[33mcommit 13861ac91c82c7081523c6a4aaa29bdb960ca1d8[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 12:17:05 2025 +0800
+
+    gitignore update
+
+[33mcommit 9181802d15bc7cdd58f153db78aefb19c9e1649d[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 12:15:33 2025 +0800
+
+    gitignore update
+
+[33mcommit b218c2677146438af818f245f4550e19c5d0207f[m[33m ([m[1;32m=d[m[33m)[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 12:11:22 2025 +0800
+
+    Untrack SQL files and fix .gitignore
+
+[33mcommit 5e13af7740c4222d8940eba5d68466b8d0d42e26[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Wed Jul 16 12:05:16 2025 +0800
+
+    init
+
+[33mcommit d2e55145e66d3db5515f79c556a8b89075452aab[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Tue Jun 24 19:36:00 2025 +0800
+
+    new commit
+
+[33mcommit 626108b5c69ed0439f4564d7665e31e193baff5b[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 15:32:01 2025 +0800
+
+    🛠️ Fix hotel-api startCommand to use hotel_app:app
+
+[33mcommit eddc9800a88d7e8523686973737a9ce11464e342[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 15:22:25 2025 +0800
+
+    ✅ Fix gunicorn startCommand: use car_app:app
+
+[33mcommit 91cc3fec5b3c65215b47b273697100b609c421e0[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 14:52:17 2025 +0800
+
+    🔧 Add buildCommand to ensure pip installs requirements
+
+[33mcommit acfb36cf45912a22869d0b72fd5bd398e5b29460[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 14:42:37 2025 +0800
+
+    📦 Add requirements.txt to each API root for Render deployment
+
+[33mcommit 596b4eb801d0413e5852087a92ec7c6791d20fa1[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 14:35:46 2025 +0800
+
+    Fix: corrected startCommand for tour-api
+
+[33mcommit 3c479cc705a61a1cbaa880d080011397c8886f11[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 14:29:58 2025 +0800
+
+    Update requirements.txt with gunicorn and python-dotenv
+
+[33mcommit cbf97739b0ee7e9cebd10f798b9926d4cc64cf8f[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 14:28:50 2025 +0800
+
+    ✅ Add gunicorn and dotenv for Render compatibility
+
+[33mcommit 1bfac2f390f8e7b54042511a9730aee9792e13e6[m
+[41mgpg: Signature made Sun Jun 15 14:18:39 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: 59e1aa0 9c91ebc
+Author: Hermes Colina <62467054+hermescolina@users.noreply.github.com>
+Date:   Sun Jun 15 14:18:39 2025 +0800
+
+    Merge pull request #12 from hermescolina/dev
+    
+    Dev
+
+[33mcommit 59e1aa0011a1805d59a73cc94722e2270b9a0174[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 14:04:20 2025 +0800
+
+    Add render.yaml for multi-service deployment
+
+[33mcommit 69d69d30932975e4bf08610c2eb08f148ea48a56[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 14:03:33 2025 +0800
+
+    Add render.yaml for multi-service deployment
+
+[33mcommit 9c91ebc19544f456de66ba4c78179e605dc7ee55[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 14:04:20 2025 +0800
+
+    Add render.yaml for multi-service deployment
+
+[33mcommit f918b5ec64ddd1f4ba3cf372551bfe1467e66230[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sun Jun 15 14:03:33 2025 +0800
+
+    Add render.yaml for multi-service deployment
+
+[33mcommit fc878b14cce56d4b8c5a983c10acb62c2f4bbf27[m
+[41mgpg: Signature made Thu Jun 12 19:54:11 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Author: Hermes Colina <62467054+hermescolina@users.noreply.github.com>
+Date:   Thu Jun 12 19:54:11 2025 +0800
+
+    Update README.md
+
+[33mcommit ea941e73115d7a5d500f4eec9e490a9fb6ce5b7d[m
+[41mgpg: Signature made Thu Jun 12 19:52:57 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Author: Hermes Colina <62467054+hermescolina@users.noreply.github.com>
+Date:   Thu Jun 12 19:52:57 2025 +0800
+
+    Update README.md
+
+[33mcommit f5290ec6323a757786ccb597ec719f6ab60e9893[m
+[41mgpg: Signature made Thu Jun 12 19:42:00 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Author: Hermes Colina <62467054+hermescolina@users.noreply.github.com>
+Date:   Thu Jun 12 19:42:00 2025 +0800
+
+    Update README.md
+
+[33mcommit f7eb159ceed1b5ddbdbd656881eacc8103457a2e[m
+[41mgpg: Signature made Thu Jun 12 19:41:08 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Author: Hermes Colina <62467054+hermescolina@users.noreply.github.com>
+Date:   Thu Jun 12 19:41:08 2025 +0800
+
+    Update README.md
+
+[33mcommit 669c8d3af1fbd67565de72bc313e59e4bf4ff966[m
+[41mgpg: Signature made Sat Jun  7 22:43:39 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: 10c6592 5276564
+Author: Hermes Colina <62467054+hermescolina@users.noreply.github.com>
+Date:   Sat Jun 7 22:43:39 2025 +0800
+
+    🔀 Merge: dev → main – TourPage, admin panel updates, image uploads
+    
+    ### ✅ Included Changes:
+    - Added `UploadHistoryImage.jsx` component with category and preview
+    - Improved `TourPage.jsx` sections, media, and category filter
+    - Added new hotel and tour images in `/uploads/` and `/public/images/`
+    - Cleaned up unused files and temp duplicates
+    - Added documentation in `/docs/` and `weekly-progress.md`
+    
+    This PR prepares `main` for updated frontend layout and backend image handling.
+
+[33mcommit 527656422b6a1960c687ad01f5c222aceda1e6c3[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sat Jun 7 21:40:22 2025 +0800
+
+    🧹 Cleanup: removed metadata file, weekly progress updates, UI improvements
+
+[33mcommit 5c06329ad2bce6df98472af76f8acc60798ea3d5[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Tue Jun 3 01:17:39 2025 +0800
+
+    Remove frontend backup folders
+
+[33mcommit 3c63991106ad5e69547459461b270ffc56a05db3[m[33m ([m[1;33mtag: v0.6-dev[m[33m)[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Tue Jun 3 01:10:45 2025 +0800
+
+    Update backend/frontend, add hotel assets, clean up unused files
+
+[33mcommit 49a116173cb6573d307bcdf9d2af29a04f9e1737[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sat May 31 16:09:21 2025 +0800
+
+    📄 Add incremental updates and caching strategy to documentation
+
+[33mcommit 10c65920d1db35fee40f2aa918a4bc354c0a35fe[m
+[41mgpg: Signature made Sat May 31 16:02:05 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: 17c8405 6294071
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Sat May 31 16:02:05 2025 +0800
+
+    Merge pull request #10 from hermescolina/dev
+    
+    📄 Add offline-first and caching strategy to docs
+
+[33mcommit 6294071fd42e56a0f637f04877eb39e3b784de8a[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sat May 31 16:01:28 2025 +0800
+
+    📄 Add offline-first and caching strategy to docs
+
+[33mcommit 17c8405f08ab096f59af9306d3a18f179af08663[m
+[41mgpg: Signature made Fri May 30 17:16:25 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: 88b6ad7 407c2b1
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Fri May 30 17:16:25 2025 +0800
+
+    Merge pull request #9 from hermescolina/dev
+    
+    ✅ Fix MySQL connection timeout issue for Render
+
+[33mcommit 407c2b13f74a3971968b20d77a99d3bac43648eb[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 30 17:15:33 2025 +0800
+
+    ✅ Fix MySQL connection timeout issue for Render
+
+[33mcommit 88b6ad7f775fc6f099483c605fbcd0d6681905c4[m
+[41mgpg: Signature made Fri May 30 17:05:53 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: 078352f 351a116
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Fri May 30 17:05:53 2025 +0800
+
+    Merge pull request #8 from hermescolina/dev
+    
+    🐳 Update Dockerfile to use Gunicorn for production
+
+[33mcommit 351a116796d64aae7a1aeed4813468d8b35903e0[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 30 17:04:34 2025 +0800
+
+    🐳 Update Dockerfile to use Gunicorn for production
+
+[33mcommit 078352f5fb5c8a6f3224df3c1adccc2bd3a1b655[m
+[41mgpg: Signature made Fri May 30 16:52:48 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: 97ee34a 0726ede
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Fri May 30 16:52:48 2025 +0800
+
+    Merge pull request #7 from hermescolina/dev
+    
+    📦 Add gunicorn to requirements for production deployment
+
+[33mcommit 0726ede0981eee4fb2a7b338f6292f8183df8f69[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 30 16:49:54 2025 +0800
+
+    📦 Add gunicorn to requirements for production deployment
+
+[33mcommit 97ee34afd7637205db85050f9cacc37b9eddb5ae[m
+[41mgpg: Signature made Fri May 30 16:40:18 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: 570865c 3c72af6
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Fri May 30 16:40:18 2025 +0800
+
+    Merge pull request #6 from hermescolina/dev
+    
+    Update frontend and backend with latest changes
+
+[33mcommit 3c72af6f730cbecd5a35e413411b9729d6b714cc[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 30 16:33:24 2025 +0800
+
+    Update frontend and backend with latest changes
+
+[33mcommit 570865c3aa95ca8d89830d4e994361c777ad9db9[m
+[41mgpg: Signature made Fri May 30 14:47:50 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: ca381dc 581f886
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Fri May 30 14:47:50 2025 +0800
+
+    Merge pull request #5 from hermescolina/dev
+    
+    ✅ Add mysql-connector-python to fix Render deployment
+
+[33mcommit 581f886c95714b73ce61df6ee055fc031b4fc808[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 30 14:46:26 2025 +0800
+
+    ✅ Add mysql-connector-python to fix Render deployment
+
+[33mcommit ca381dc27d9d49e460320d4e76cd78bdcfe2a319[m
+[41mgpg: Signature made Fri May 30 14:23:01 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: 892c133 fd2c2a8
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Fri May 30 14:23:01 2025 +0800
+
+    feat: merge dev branch with dynamic tour routing and updated documentation
+    
+    feat: integrate dynamic tour page routing, API-backed tour data, and updated project README
+
+[33mcommit fd2c2a8996db1f5b8cf042cdb1025afde1758969[m[33m ([m[1;33mtag: backup-working-dynamic-setup[m[33m)[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 30 14:11:07 2025 +0800
+
+    🧹 Removed obsolete static tour pages and node backup
+
+[33mcommit 0d6c2332fc0aa2e61f07ff4dd34aa95bc5b98d3b[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 30 14:10:49 2025 +0800
+
+    🔒 Stable dynamic setup: working routing, API, TourPage, and backup notes
+
+[33mcommit a31edd31c1f70c0805f33a5c498bb6dd8af11d21[m[33m ([m[1;31morigin/temp_dev[m[33m)[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu May 29 22:16:38 2025 +0800
+
+    Prepare dev branch as temp_dev backup
+
+[33mcommit 892c13318414ac93d2f6b14745032b7b5da1e1ba[m
+[41mgpg: Signature made Thu May 29 15:16:23 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Thu May 29 15:16:23 2025 +0800
+
+    Update README.md
+
+[33mcommit e5a2a2721227dca5a926ff6551e00ff4646e5bfc[m
+[41mgpg: Signature made Thu May 29 14:31:30 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: e5896bb b1db0c3
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Thu May 29 14:31:30 2025 +0800
+
+    docs: add dynamic subpage architecture and TourDetail template setup
+    
+    Add dynamic subpage template documentation and layout improvementsdocs: add dynamic subpage architecture and TourDetail template setup
+    
+    - Created initial markdown documentation for dynamic subpage logic
+    - Implemented base TourDetail.jsx component with query string routing
+    - Defined structure for additional templates (VendorProfile, BookingPage, Analytics)
+    - Prepared dev branch for dynamic routing and scalable page rendering
+    
+    #tourwise #documentation #routing #dynamic-pages
+
+[33mcommit b1db0c36eede4c61d15e1d98d77d76cbc6f9f9c6[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Thu May 29 14:28:36 2025 +0800
+
+    🔧 Update docs and push TourWise dynamic subpage setup
+
+[33mcommit cbba7387b320a275d257cf50a8ea50947303454f[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Tue May 27 22:05:52 2025 +0800
+
+    docs: add project progress and roadmap [Progress: 15%]
+
+[33mcommit 368d631e1e545f0f7e5363e4f6572b9faa52b422[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Tue May 27 21:37:13 2025 +0800
+
+    docs: update README with new site link and structure overview [Progress: 2%]
+
+[33mcommit e5896bbbf1bd2cf48e1fc6a080a2481f20852e72[m
+[41mgpg: Signature made Tue May 27 21:16:28 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: a1922d8 41d5968
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Tue May 27 21:16:28 2025 +0800
+
+    docs: update README with live site link, revised structure, and deployment instructions
+    
+    docs: update README with new site link, feature set, and project stru…
+
+[33mcommit 41d596805b0735a00a00db88a5f4b792032bb179[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Tue May 27 20:57:45 2025 +0800
+
+    docs: update README with new site link, feature set, and project structure
+
+[33mcommit a1922d834b9bec61442585a93a205561fa6285b8[m
+[41mgpg: Signature made Tue May 27 20:33:48 2025 CST[m
+[41mgpg:                using RSA key B5690EEEBB952194[m
+[41mgpg: Can't check signature: No public key[m
+Merge: eb96f69 636ef1b
+Author: hermescolina <62467054+hermescolina@users.noreply.github.com>
+Date:   Tue May 27 20:33:48 2025 +0800
+
+    Merge pull request #1 from hermescolina/dev
+    
+    Update El Nido, Vigan, Siargao pages with Book Now functionality + do…
+
+[33mcommit 636ef1b20ee2de951897ce54ef32518b30614519[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Tue May 27 20:32:15 2025 +0800
+
+    Update El Nido, Vigan, Siargao pages with Book Now functionality + doc updates
+
+[33mcommit eb96f6955a88d7db9b6e8d1f47fdfa69a875bd79[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Tue May 27 13:07:44 2025 +0800
+
+    Handle empty filtered tours with user message; remove undefined 'price' reference in console log
+
+[33mcommit ac576dc3be84c21ac7af4caaf657762e86ac3e4e[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sat May 24 18:19:27 2025 +0800
+
+    docs: add complete project overview with setup, structure, and roadmap
+
+[33mcommit f24401a42aab14fb2e16943da4a14de20e6b6aca[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Sat May 24 13:47:53 2025 +0800
+
+    Add live chart demo GIF
+
+[33mcommit e2505d6c23536b92bbfd2156f4f7880a2fcdcc33[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 22:23:45 2025 +0800
+
+    git add README.md
+
+[33mcommit a7a5d829005a221c2fcf81e662d65a8d425ff390[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 22:21:39 2025 +0800
+
+    docs: update main README for Kubernetes deployment
+
+[33mcommit ef5c39730c2aea91ec88a16b259ce8b7c386981a[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 22:13:20 2025 +0800
+
+    chore: remove large binary and add to .gitignore
+
+[33mcommit a303eebbc07c9bea07ad275f940a5ddaab275082[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 22:11:40 2025 +0800
+
+    feat(k8s): deploy full-stack app with Flask, React, Docker, and Kubernetes
+
+[33mcommit b0179c63c9ce1a1074eeebf16619f45a3f1af728[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 20:52:26 2025 +0800
+
+    Add documentation for single-file Flask backend
+
+[33mcommit d54a9c5304d1a229f1da0dfeef3608f0ad92660d[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 20:41:41 2025 +0800
+
+    Add live dashboard: Flask API + React Chart.js
+
+[33mcommit 4c6ae81cd22111d4a57467bff71b5eebf005e1c9[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 20:23:07 2025 +0800
+
+    docs: add project overview, features list, and author info
+
+[33mcommit 56d977833edacc773d0ee28379a404adc0ff0433[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 20:01:33 2025 +0800
+
+    Restore and update project overview
+
+[33mcommit d189a9d1df27a6ec5687d97f8b701eada97d493c[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 19:40:51 2025 +0800
+
+    Add project overview documentation
+
+[33mcommit 3e187b68632b60b195e10f29d7103dba0a5aab13[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 19:38:27 2025 +0800
+
+    Embed analytics charts in README
+
+[33mcommit 8cc7f059137fb44cb87b0222d0745faf2b7128f1[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 19:36:03 2025 +0800
+
+    Add charts: Revenue per tour, peak booking periods, and user engagement
+
+[33mcommit d2176a1c1e09a962e9ed440c3d226d0632d2cff3[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 19:26:49 2025 +0800
+
+    Add project overview documentation
+
+[33mcommit e28d591d47f8d67d0d5daed9c3308a66d0af6d9e[m
+Merge: ef0f01b 67906bb
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 19:19:52 2025 +0800
+
+    Merge branch 'master' of https://github.com/hermescolina/tourism-analytics
+
+[33mcommit ef0f01b7fc04bf1f5029736c197c8c5636f02aa9[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 19:18:53 2025 +0800
+
+    Embed average guests per tour chart in README
+
+[33mcommit fd0680ca59eadb6f13449c7226b6585b6a90c7ae[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 19:10:17 2025 +0800
+
+    Add visualization: Average Guests Per Tour
+
+[33mcommit 67906bb3af945732015989346a340777978a6ecf[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 19:10:17 2025 +0800
+
+    Add visualization: Average Guests Per Tour
+
+[33mcommit a86a3307fb04abadc06485282f4c81b4fd76375d[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 18:50:15 2025 +0800
+
+    Embed most booked tours chart in README
+
+[33mcommit aadc85cd09b7383b1af347693917cf5c39903bec[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 18:47:58 2025 +0800
+
+    Add Visuals
+
+[33mcommit 41216411b7590d518b53a2aeb39104332f44a1f4[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 18:40:46 2025 +0800
+
+    Updated README
+
+[33mcommit fdfc6c777174f89b249390434086598865dce621[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 18:36:58 2025 +0800
+
+    Add README
+
+[33mcommit 2ea77a09ad160f390a39d02973d8b9cd2ec256a0[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 18:32:12 2025 +0800
+
+    Add project README
+
+[33mcommit 4940e978b0d4682749b59dc72d7faecbc2616e9b[m
+Author: hermescolina <itloboc@gmail.com>
+Date:   Fri May 23 18:19:31 2025 +0800
+
+    Initial commit

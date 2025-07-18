@@ -1,0 +1,31 @@
+{
+  "topTours": [
+    {
+      "title": "Chocolate Hills Adventure",
+      "location": "Bohol",
+      "image": "/images/chocolate_hills.jpg",
+      "price": 1800.0,
+      "rating": 0.0,
+      "views": 0,
+      "slug": "chocolate-hills-adventure"
+    },
+    {
+      "title": "El Nido Island Hopping",
+      "location": "Palawan",
+      "image": "/images/el_nido.jpg",
+      "price": 2000.0,
+      "rating": 0.0,
+      "views": 0,
+      "slug": "el-nido-island-hopping"
+    },
+    {
+      "title": "Vigan City Tour",
+      "location": "Ilocos Sur",
+      "image": "/images/vigan_heritage_tour.png",
+      "price": 1200.0,
+      "rating": 0.0,
+      "views": 0,
+      "slug": "vigan-city-tour"
+    }
+  ]
+}
