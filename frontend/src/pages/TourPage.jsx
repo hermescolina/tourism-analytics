@@ -1,25 +1,18 @@
+import { apiBaseTour, frontendBase } from '../config';
 import { useRef, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import styles from './TourPage.module.css';
 import VideoPlayer from '../components/VideoPlayer';
+import TourItinerary from '../components/TourItinerary';
+import WhatsIncluded from '../components/WhatsIncluded';
 
 const base = '/tourism-analytics';
-const apiBase = 'https://api.tourwise.shop';
-const urlBase = 'https://app.tourwise.shop/tourism-analytics';
+const apiBase = apiBaseTour;
+const urlBase = `${frontendBase}${base}`;
 
 const handleReaction = (videoId, type) => {
     console.log(`User reacted with ${type} on video ${videoId}`);
-    // Optional: send to backend
 };
-
-// const toggleCommentBox = (videoId) => {
-//     setActiveCommentVideo(prev => (prev === videoId ? null : videoId));
-// };
-
-// const submitComment = (videoId) => {
-//     console.log(`Comment on video ${videoId}:`, comments[videoId]);
-//     setActiveCommentVideo(null);
-// };
 
 export default function TourPage() {
     const [activeIndex, setActiveIndex] = useState(0);
@@ -28,11 +21,14 @@ export default function TourPage() {
     const [error, setError] = useState('');
     const [selectedCategory, setSelectedCategory] = useState("Tour Videos");
     const [tourVideos, setTourVideos] = useState([]);
+    const [showOverlay, setShowOverlay] = useState(false);
 
 
 
     const categoryRef = useRef(null);
     const videoRef = useRef(null);
+
+    console.log('API BASE', apiBase);
 
     useEffect(() => {
         fetch(`${apiBase}/api/tours/${slug}`)
@@ -52,6 +48,17 @@ export default function TourPage() {
             });
     }, [slug]);
 
+
+
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowOverlay(window.scrollY > 100);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
 
     useEffect(() => {
@@ -122,7 +129,7 @@ export default function TourPage() {
         ? `${urlBase}${imagePath.replace('/uploads', '')}`
         : `${apiBase}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
 
-    const categories = ["About the Tour", "What to Expect", "History and Culture", "Tour Videos"];
+    const categories = ["Tips for Visitors", "Tour Itinerary", "About the Tour", "What to Expect", "History and Culture", "Tour Videos"];
 
 
     const handleCategoryChange = (e) => {
@@ -242,8 +249,12 @@ export default function TourPage() {
             < div >
                 {tourVideos
                     .filter(video => video.category === selectedCategory)
+                    .reverse()
                     .map((video, idx) => (
                         <div key={idx} className={styles.videoCard}>
+                            <div className={`${styles.dayOverlay} ${showOverlay ? styles.visible : styles.hidden}`}>
+                                Day {idx + 1}
+                            </div>
                             <VideoPlayer videoId={video.video_id} index={idx} />
 
                             <div style={{ marginTop: '1rem' }}>
@@ -287,8 +298,6 @@ export default function TourPage() {
 
             {
                 tour.history_images && tour.history_images.length > 0 && (
-
-
                     <div id="tourContentStart" className={styles.history}>
                         <section className={`${styles.tourSection} ${styles.historySection}`}>
                             <h2>{selectedCategory}</h2>
@@ -352,16 +361,41 @@ export default function TourPage() {
                 )
             }
 
-            <div style={{ height: '150vh' }}></div>
 
-            <section className={styles.tourSection}>
-                <h2>Tips for Visitors</h2>
-                <ul>
-                    {(tour.tips || '').split(';').map((item, idx) => (
-                        <li key={idx}>{item.trim()}</li>
-                    ))}
-                </ul>
-            </section>
+            {tour.inclusions && tour.inclusions.length > 0 && (
+                <section className={styles.tourSection}>
+                    <h2>What’s Included</h2>
+                    <WhatsIncluded
+                        inclusions={tour.inclusions.split(';')}
+                        exclusions={tour.exclusions?.split(';') || []}
+                    />
+                </section>
+            )}
+
+
+
+            {tour.tour_itinerary && tour.tour_itinerary.length > 0 && (
+                <section className={styles.tourSection}>
+                    <h2>Tour Itinerary</h2>
+                    <TourItinerary itineraries={JSON.parse(tour.tour_itinerary || '[]')} />
+                </section>
+            )}
+
+
+
+            <div style={{ height: '300px' }}></div>
+
+            {selectedCategory === 'Tips for Visitors' &&
+                <section className={styles.tourSection}>
+                    <h2>Tips for Visitors</h2>
+                    <ul>
+                        {(tour.tips || '').split(';').map((item, idx) => (
+                            <li key={idx}>{item.trim()}</li>
+                        ))}
+                    </ul>
+                </section>
+            }
+
         </div >
     );
 }

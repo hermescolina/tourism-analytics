@@ -1,0 +1,48 @@
+body,
+html {
+    overflow-y: auto;
+}
+
+.videoLayer {
+    position: fixed;
+    /* Or absolute */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    opacity: 1;
+    pointer-events: none;
+    /* So clicks go through */
+    background: black;
+    /* Fallback if video fails */
+}
+
+.videoLayer.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+.fullscreenWrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+}
+
+
+.videoLayer iframe {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.videoCard {
+    margin-top: 0px;
+    /* Push each video down */
+    position: relative;
+    z-index: 1;
+}

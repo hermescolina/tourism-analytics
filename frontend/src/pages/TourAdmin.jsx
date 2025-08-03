@@ -12,9 +12,10 @@ export default function TourAdmin() {
     const [categories, setCategories] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-
-    console.log("API Base URL:", apiBaseTour);
-    console.log("Frontend Base URL:", frontendBase);
+    const base = `${frontendBase}/tourism-analytics/`;
+    const imageBase = `${apiBaseTour}/uploads/`;
+    console.log("API Base URL:", imageBase);
+    console.log("Frontend Base URL:", base);
 
     const [form, setForm] = useState({
         title: '', slug: '', location: '', price: '',
@@ -27,8 +28,8 @@ export default function TourAdmin() {
 
         const handleScroll = () => {
             const rect = header?.getBoundingClientRect();
-            console.log('📏 Header top position:', rect?.top);
-            console.log('📐 Header computed position:', getComputedStyle(header).position);
+            // console.log('📏 Header top position:', rect?.top);
+            // console.log('📐 Header computed position:', getComputedStyle(header).position);
         };
 
         window.addEventListener('scroll', handleScroll);
@@ -53,7 +54,7 @@ export default function TourAdmin() {
 
     const fetchTours = async () => {
         try {
-            const res = await fetch(`${apiBaseTour}/api/landing-data`);
+            const res = await fetch(`${apiBaseTour}/api/tour-data`);
             const data = await res.json();
             setTours(data.topTours || []);
         } catch (err) {
@@ -83,7 +84,7 @@ export default function TourAdmin() {
             available_slots: tour.available_slots || '',
             category_id: tour.category_id || '',
             image: null,
-            existingImage: tour.image || null
+            existingImage: tour.card_image || null
         });
 
         setIsEditing(true);
@@ -105,6 +106,27 @@ export default function TourAdmin() {
         });
         console.log("✏️ Editing ID:", tour.id || tour.slug);
     };
+
+
+    function handleDelete(id) {
+        if (window.confirm('Are you sure you want to delete this tour?')) {
+            fetch(`${apiBaseTour}/api/delete-tour/${id}`, {
+                method: 'DELETE',
+            })
+
+                .then(res => res.json())
+                .then(data => {
+                    alert('Tour deleted successfully!');
+                    // Optionally refresh list
+                    window.location.reload();
+                })
+                .catch(err => {
+                    console.error('Delete failed:', err);
+                    alert('Error deleting tour.');
+                });
+        }
+    }
+
 
 
     const handleSubmit = async (e) => {
@@ -153,7 +175,7 @@ export default function TourAdmin() {
                 <div className={styles.logoSection}>
                     <Link to="/tour-cards">
                         <img
-                            src={`${frontendBase}/images/tourwise.png`}
+                            src={`${base}/tourwise.png`}
                             alt="TourWise"
                             className={styles.logoImage}
                         />
@@ -178,13 +200,39 @@ export default function TourAdmin() {
             <form onSubmit={handleSubmit} className={styles.tourForm}>
                 {['title', 'slug', 'location', 'price', 'description', 'start_date', 'end_date', 'available_slots'].map((field, i) => (
                     <div className={styles.formGroup} key={i}>
-                        <label>{field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</label>
+                        <label>
+                            {field.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </label>
+
                         {field === 'description' ? (
-                            <textarea name={field} rows="6" value={form[field]} onChange={handleChange} required />
+                            <>
+                                <textarea
+                                    name={field}
+                                    rows="6"
+                                    maxLength={200}
+                                    value={form[field]}
+                                    onChange={handleChange}
+                                    required
+                                />
+                                <p>{form[field]?.length || 0} / 200 characters</p>
+                            </>
                         ) : (
-                            <input type={field.includes('date') ? 'date' : field === 'price' || field === 'available_slots' ? 'number' : 'text'} name={field} value={form[field]} onChange={handleChange} required />
+                            <input
+                                type={
+                                    field.includes('date')
+                                        ? 'date'
+                                        : field === 'price' || field === 'available_slots'
+                                            ? 'number'
+                                            : 'text'
+                                }
+                                name={field}
+                                value={form[field]}
+                                onChange={handleChange}
+                                required
+                            />
                         )}
                     </div>
+
                 ))}
 
                 <div className={styles.formGroup}>
@@ -208,9 +256,10 @@ export default function TourAdmin() {
                         </div>
                     ) : form.existingImage ? (
                         (() => {
-                            const imageSrc = form.existingImage.startsWith('/uploads')
-                                ? `${apiBaseTour}${form.existingImage}`
-                                : `${frontendBase}${form.existingImage}`;
+                            console.log("🖼️ Existing image:", form.existingImage);
+                            const imageSrc = form.existingImage.startsWith('/images')
+                                ? `${base}${form.existingImage}`
+                                : `${imageBase}${form.existingImage}`;
 
 
                             console.log("📸 Preview image src:", imageSrc);
@@ -258,25 +307,34 @@ export default function TourAdmin() {
                     </tr>
                 </thead>
                 <tbody>
-                    {tours.map(tour => {
-                        const imageSrc = tour.image.startsWith('/uploads')
-                            ? `${apiBaseTour}${tour.image}`
-                            : `${frontendBase}${tour.image}`;
-                        console.log("Image Source:", imageSrc);
-                        return (
-                            <tr key={tour.slug}>
-                                <td>{tour.title}</td>
-                                <td>{tour.location}</td>
-                                <td>₱ {Number(tour.price).toLocaleString()}</td>
-                                <td>
-                                    <img src={imageSrc} alt={tour.title} style={{ width: '80px', borderRadius: '6px' }} />
-                                </td>
-                                <td>
-                                    <button onClick={() => handleEdit(tour)}>Edit</button>
-                                </td>
-                            </tr>
-                        );
-                    })}
+                    {tours
+                        .filter(tour => tour.type === 'tour')
+                        .map(tour => {
+                            console.log("Image Source_:", tour.card_image);
+                            const imageSrc = tour.card_image.startsWith('/images')
+                                ? `${base}${tour.card_image}`
+                                : `${imageBase}${tour.card_image}`;
+                            console.log("Image Source__:", imageSrc);
+                            return (
+                                <tr key={tour.slug}>
+                                    <td>{tour.title}</td>
+                                    <td>{tour.location}</td>
+                                    <td>₱ {Number(tour.price).toLocaleString()}</td>
+                                    <td>
+                                        <img src={imageSrc} alt={tour.title} style={{ width: '80px', borderRadius: '6px' }} />
+                                    </td>
+                                    <td>
+                                        <button onClick={() => handleEdit(tour)}>Edit</button>
+                                        <button
+                                            onClick={() => handleDelete(tour.id)}
+                                            style={{ backgroundColor: 'red', color: 'white' }}
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                 </tbody>
 
             </table>

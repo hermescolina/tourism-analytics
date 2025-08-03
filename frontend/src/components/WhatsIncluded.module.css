@@ -1,0 +1,26 @@
+.container {
+    padding: 1.5rem 0;
+}
+
+.columns {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+}
+
+.inclusion {
+    color: #007f5f;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.exclusion {
+    color: #c1121f;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}

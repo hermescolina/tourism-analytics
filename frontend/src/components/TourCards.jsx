@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { apiBaseTour } from '../config';
+import { apiBaseTour, frontendBase } from '../config';
 import { useState, useEffect } from 'react';
 import styles from './TourCards.module.css';
 import { useCart } from '../components/CartContext'; // adjust the path if needed
 
-const base = '/tourism-analytics';
+const base = `${frontendBase}/tourism-analytics`;
+const baseimageurl = `${apiBaseTour}/uploads/`;
 
 export default function BrowseTours() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export default function BrowseTours() {
   const [locationFilter, setLocationFilter] = useState('');
   const { cartItems, addToCart, loadCart } = useCart();
   const [quantity, setQuantity] = useState({});
+  const [selectedDate, setSelectedDate] = useState("");
 
 
 
@@ -23,7 +25,7 @@ export default function BrowseTours() {
 
 
   useEffect(() => {
-    fetch(`${apiBaseTour}/api/landing-data`)
+    fetch(`${apiBaseTour}/api/tour-data`)
       .then(async res => {
         const text = await res.text();
         console.log("📦 Raw response text from API:", text);
@@ -94,6 +96,8 @@ export default function BrowseTours() {
     const locationNormalized = normalize(tour.location || '');
     const priceValue = Number(tour.price);
 
+
+
     const matchesSearch = titleNormalized.startsWith(searchNormalized);
     const matchesLocation = locationNormalized.startsWith(locationFilterNormalized);
     const matchesPrice = priceValue >= safeMinPrice && priceValue <= safeMaxPrice;
@@ -101,11 +105,9 @@ export default function BrowseTours() {
     return matchesSearch && matchesLocation && matchesPrice;
   });
 
-  console.log("🖼️ image path:", `${base}/images/tourwise.png`);
-
 
   useEffect(() => {
-    fetch(`${apiBaseTour}/api/landing-data`)
+    fetch(`${apiBaseTour}/api/tour-data`)
       .then(res => res.json())
       .then(data => {
         setTours(data.topTours || []);
@@ -209,102 +211,136 @@ export default function BrowseTours() {
         <div className={styles.browseContent}>
           <div className={styles.tourGrid}>
 
-            {filteredTours.map((tour, index) => {
-              const isInCart = cartItems.some(item => item.id === tour.id);
-              console.log('Checking if tour is in cart:', {
-                cartItems,
-                currentTourId: tour.id
-              });
+            {filteredTours
+              .filter(tour => tour.type === 'tour') // Ensure card_image exists
+              .map((tour, index) => {
+                const isInCart = cartItems.some(item => item.id === tour.id);
+                console.log('Checking if tour is in cart:', {
+                  cartItems,
+                  currentTourId: tour.id
+                });
 
-              return (
-                <div
-                  key={index}
-                  className={styles.tourCard}
-                  onClick={() => handleCardClick(tour)}
-                >
-                  <img
-                    src={tour.image.includes('uploads')
-                      ? `${apiBaseTour}/${tour.image}`
-                      : `${base}${tour.image}`}
-                    alt={tour.title}
-                    className={styles.tourCardImage}
-                  />
+                console.log(`Tour Images: ${tour.card_image}`);
+                console.log(`Tour Image: ${base}${tour.card_image}`);
+                console.log(`Tour Image_: ${baseimageurl}${tour.card_image}`);
 
-                  <div className={styles.tourCardDetails}>
-                    <h3 className={styles.tourTitle}>{tour.title}</h3>
-                    <p className={styles.tourDescription}>{tour.description}</p>
-                    <p className={styles.tourPrice}>₱ {Number(tour.price).toLocaleString()}</p>
-                    <p className={styles.tourSlots}>🎟️ {tour.available_slots} slots available</p>
-                    <p className={styles.tourDates}>
-                      📅 {tour.start_date && tour.end_date ? (
-                        <>
-                          {new Date(tour.start_date).toLocaleDateString('en-PH', {
-                            weekday: 'short',
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                          })} –{' '}
-                          {new Date(tour.end_date).toLocaleDateString('en-PH', {
-                            weekday: 'short',
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric'
-                          })}
-                        </>
-                      ) : 'Date not set'}
-                    </p>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+
+                return (
+                  <div
+                    key={index}
+                    className={styles.tourCard}
+                    onClick={() => handleCardClick(tour)}
+                  >
+                    <img
+                      src={tour.card_image.includes('/images')
+                        ? `${base}${tour.card_image}`
+                        : `${baseimageurl}${tour.card_image}`}
+
+                      alt={tour.title}
+                      className={styles.tourCardImage}
+                    />
+
+                    <div className={styles.tourCardDetails}>
+                      <h3 className={styles.tourTitle}>{tour.title}</h3>
+                      <p className={styles.tourDescription}>{tour.description}</p>
+                      <p className={styles.tourPrice}>₱ {Number(tour.price).toLocaleString()}</p>
+                      <p className={styles.tourSlots}>🎟️ {tour.available_slots} slots available</p>
+                      <p className={styles.tourDates}>
+                        📅 {tour.start_date && tour.end_date ? (
+                          <>
+                            {new Date(tour.start_date).toLocaleDateString('en-PH', {
+                              weekday: 'short',
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })} –{' '}
+                            {new Date(tour.end_date).toLocaleDateString('en-PH', {
+                              weekday: 'short',
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                          </>
+                        ) : 'Date not set'}
+                      </p>
+
+                      <label htmlFor="tourDate"> Select Tour Date:  </label>
                       <input
-                        type="number"
-                        min="1"
-                        value={quantity[tour.id] || 1}
+                        type="date"
                         onClick={(e) => e.stopPropagation()}
-                        onChange={(e) => {
-                          const qty = Math.max(1, parseInt(e.target.value) || 1);
-                          setQuantity(prev => ({ ...prev, [tour.id]: qty }));
-                        }}
-                        style={{
-                          width: '60px',
-                          padding: '0.25rem',
-                          borderRadius: '4px',
-                          border: '1px solid #ccc'
-                        }}
+                        id="tourDate"
+                        min="2025-06-03"
+                        max="2026-06-28"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
                       />
 
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (!isInCart)
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
+                        <input
+                          type="number"
+                          min="1"
+                          value={quantity[tour.id] || 1}
+                          onClick={(e) => e.stopPropagation()}
+                          onChange={(e) => {
+                            const qty = Math.max(1, parseInt(e.target.value) || 1);
+                            setQuantity(prev => ({ ...prev, [tour.id]: qty }));
+                          }}
+                          style={{
+                            width: '60px',
+                            padding: '0.25rem',
+                            borderRadius: '4px',
+                            border: '1px solid #ccc'
+                          }}
+                        />
+
+
+
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!isInCart)
+                              console.log('Adding to cart:', {
+                                ...tour,
+                                item_id: tour.item_id,               // ✅ send legacy item_id (2) to backend
+                                quantity: quantity[tour.id] || 1,
+                                type: 'tour',
+                                selected_date: selectedDate
+                              });
                             addToCart({
                               ...tour,
-                              quantity: quantity[tour.id] || 1,
-                              type: 'tour'
+                              item_id: tour.item_id,               // ✅ send legacy item_id (2) to backend
+                              quantity: quantity[tour.id] || 1,    // ✅ still use id (31) to track quantity locally in UI
+                              type: 'tour',
+                              selected_date: selectedDate
                             });
-                        }}
-                        style={{
-                          padding: '0.3rem 0.75rem',
-                          backgroundColor: '#007bff',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {isInCart ? '✅ Added' : '➕ Add to Cart'}
-                      </button>
+
+                            // { console.log('Adding to cart:', { tour }) }
+                          }}
+                          style={{
+                            padding: '0.3rem 0.75rem',
+                            backgroundColor: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          {isInCart ? '✅ Added' : '➕ Add to Cart'}
+                        </button>
+                      </div>
+
+                      {/* ✅ Show computed price (price × quantity) */}
+                      <p style={{ marginTop: '0.25rem', fontWeight: 'bold' }}>
+                        🧮 Total: ₱{(parseFloat(tour.price) * (quantity[tour.id] || 1)).toFixed(2)}
+                      </p>
+
+
                     </div>
-
-                    {/* ✅ Show computed price (price × quantity) */}
-                    <p style={{ marginTop: '0.25rem', fontWeight: 'bold' }}>
-                      🧮 Total: ₱{(parseFloat(tour.price) * (quantity[tour.id] || 1)).toFixed(2)}
-                    </p>
-
-
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
 
             {filteredTours.length === 0 && (
               <p className={styles.noResultsMessage}>No matching tours found.</p>

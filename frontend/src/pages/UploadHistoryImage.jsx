@@ -249,6 +249,36 @@ export default function UploadMedia() {
                 </div>
             </header>
 
+            <section style={{ marginTop: '2rem' }}>
+                <h3>Add New Video</h3>
+                <form onSubmit={handleVideoUpload} className={styles.uploadForm}>
+                    <label>
+                        YouTube Video URL:
+                        <input
+                            type="text"
+                            placeholder="https://www.youtube.com/watch?v=VIDEO_ID"
+                            value={videoUrl}
+                            onChange={(e) => setVideoUrl(e.target.value)}
+                            style={{ width: '100%', marginTop: '4px' }}
+                        />
+                    </label>
+                    <br /><br />
+                    <label>
+                        Caption:
+                        <textarea
+                            rows={2}
+                            value={videoCaption}
+                            onChange={(e) => setVideoCaption(e.target.value)}
+                            style={{ width: '100%' }}
+                        />
+                    </label>
+                    <br />
+                    <button type="submit" className={styles.actionButton}>
+                        Upload Video
+                    </button>
+                </form>
+            </section>
+
             <section className={styles.tourSection}>
                 <h2>Tour: {tour.title}</h2>
                 <form onSubmit={handleUpload} className={styles.uploadForm}>
@@ -430,35 +460,7 @@ export default function UploadMedia() {
             </section>
 
 
-            <section style={{ marginTop: '2rem' }}>
-                <h3>Add New Video</h3>
-                <form onSubmit={handleVideoUpload} className={styles.uploadForm}>
-                    <label>
-                        YouTube Video URL:
-                        <input
-                            type="text"
-                            placeholder="https://www.youtube.com/watch?v=VIDEO_ID"
-                            value={videoUrl}
-                            onChange={(e) => setVideoUrl(e.target.value)}
-                            style={{ width: '100%', marginTop: '4px' }}
-                        />
-                    </label>
-                    <br /><br />
-                    <label>
-                        Caption:
-                        <textarea
-                            rows={2}
-                            value={videoCaption}
-                            onChange={(e) => setVideoCaption(e.target.value)}
-                            style={{ width: '100%' }}
-                        />
-                    </label>
-                    <br />
-                    <button type="submit" className={styles.actionButton}>
-                        Upload Video
-                    </button>
-                </form>
-            </section>
+
         </div>
     );
 }

@@ -8,6 +8,18 @@ export function CartProvider({ children }) {
 
     const addToCart = async (item) => {
         try {
+            const payload = {
+                user_id: 1, // 🔁 Replace with dynamic user ID if available
+                vendor_id: item.vendor_id,
+                item_type: item.type,
+                item_id: item.id,
+                item_code: item.slug,
+                quantity: item.quantity,
+                total_price: item.price * item.quantity,
+                selected_date: item.selected_date,
+            };
+
+            console.log("📝 Cart Payload:", payload);
             const response = await fetch(`${apiBaseTour}/api/cr/cart`, {
                 method: 'POST',
                 headers: {
@@ -17,10 +29,11 @@ export function CartProvider({ children }) {
                     user_id: 1, // 🔁 Replace with dynamic user ID if available
                     vendor_id: item.vendor_id,
                     item_type: item.type,
-                    item_id: item.id,
+                    item_id: item.item_id,
                     item_code: item.item_code,
                     quantity: item.quantity,
                     total_price: item.price * item.quantity,
+                    selected_date: item.selected_date,
                 }),
             });
 

@@ -26,11 +26,13 @@ export default function CartPage() {
             user_id: 1, // You can replace this with real user ID later
             email: "itloboc@gmail.com", // Replace with dynamic email if needed
             bookings: confirmedItems.map(item => ({
-                title: (item.title || item.tour_title),
-                price: (item.price || item.tour_price).toString(),
+                title: (item.title || item.item_title),
+                price: (item.price || item.item_price).toString(),
                 quantity: item.quantity
             }))
         };
+
+        console.log("📤 Booking payload:", payload); // Debugging: log the payload being sent
 
         try {
             const response = await fetch(`${apiBaseTour}/api/cr/book-cart`, {
@@ -126,17 +128,18 @@ export default function CartPage() {
                     <div className={styles.tourGrid}>
 
                         {cartItems.map((item, index) => {
-                            const isUpload = (item.image || item.tour_image)?.startsWith('/images');
+                            console.log('Rendering cart item:', item);
+                            const isUpload = (item.image || item.item_image)?.startsWith('/images');
                             const imageSrc = isUpload
-                                ? `${frontendBase}/tourism-analytics${item.image || item.tour_image}`
-                                : `${apiBaseTour}/uploads/${item.image || item.tour_image}`;
-
+                                ? `${frontendBase}/tourism-analytics${item.image || item.item_image}`
+                                : `${apiBaseTour}/uploads/${item.image || item.item_image}`;
+                            console.log('Image source:', imageSrc);
                             return (
 
                                 <div key={index} className={styles.tourCard}>
                                     <h3>{item.title}</h3>
 
-                                    {(item.image || item.tour_image) && (
+                                    {(item.image || item.item_image) && (
                                         <img
                                             src={imageSrc}
                                             alt={item.title}
@@ -157,9 +160,9 @@ export default function CartPage() {
 
                                     {/* ✅ Cart Item Pricing Summary */}
                                     <p>
-                                        💵 Price per Pax: ₱{parseFloat(item.price || item.tour_price).toFixed(2)}<br />
+                                        💵 Price per Pax: ₱{parseFloat(item.price || item.item_price).toFixed(2)}<br />
                                         👥 Quantity: {item.quantity}<br />
-                                        🧮 Total: ₱{(parseFloat(item.price || item.tour_price) * item.quantity).toFixed(2)}
+                                        🧮 Total: ₱{(parseFloat(item.price || item.item_price) * item.quantity).toFixed(2)}
                                     </p>
 
                                     <div style={{ marginTop: '1.5rem' }}>
@@ -213,7 +216,7 @@ export default function CartPage() {
                             paddingTop: '1rem'
                         }}>
                             Grand Total: ₱{cartItems.reduce((sum, item) => (
-                                sum + (parseFloat(item.price || item.tour_price) * item.quantity)
+                                sum + (parseFloat(item.price || item.item_price) * item.quantity)
                             ), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </div>
                     )}

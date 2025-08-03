@@ -19,7 +19,9 @@ import BookPage from './pages/BookPage';
 import CartPage from './components/CartPage'; // adjust path
 import BookingVoucherPage from './components/BookingVoucherPage';
 import PaymentInstructionsPage from './components/PaymentInstructionsPage';
-
+// import TourItinerary from './components/TourItinerary';
+import TourDetailsAdmin from './pages/TourDetailsAdmin';
+import TestPage from './pages/TestPage'; // Import the test page
 
 
 
@@ -49,7 +51,7 @@ export default function App() {
 
         <Route path="/admin/hotel/:slug" element={<HotelAdmin />} />
 
-        <Route path="/admin/tours" element={<TourAdmin />} />
+        <Route path="/admin/items" element={<TourAdmin />} />
 
         <Route path="/admin/tour-cards" element={<TourCardsAdmin />} />
 
@@ -74,6 +76,14 @@ export default function App() {
         <Route path="/voucher/:referenceId" element={<BookingVoucherPage />} />
 
         <Route path="/payment-instructions/:reference_id" element={<PaymentInstructionsPage />} />
+
+        {/* <Route path="/admin/tour-itinerary" element={<TourItinerary />} /> */}
+
+        <Route path="/upload-itinerary/:slug" element={<TourDetailsAdmin />} />
+
+
+        <Route path="/TestPage" element={<TestPage />} />
+
 
       </Routes>
     </Router>

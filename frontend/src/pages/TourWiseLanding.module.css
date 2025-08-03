@@ -99,6 +99,7 @@
    Hero Section
 =========================== */
 .hero {
+    /* width: 33%;
     background:
         linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)),
         url('/tourism-analytics/images/landingbackgnd.png') center/cover no-repeat;
@@ -112,6 +113,7 @@
     height: 80vh;
     background-color: #000;
     position: relative;
+    animation: slideAnimation 6s cubic-bezier(0.25, 1, 0.5, 1) infinite; */
 }
 
 .heroContent h1 {
@@ -523,4 +525,140 @@
     font-weight: bold;
     text-align: center;
     margin-bottom: 1.5rem;
+}
+
+/* ===========================
+   TourWise Landing Page Styles
+=========================== */
+
+/* Existing hero layout */
+.hero {
+    width: 100vw;
+    height: 100vh;
+    background:
+        linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)),
+        center/cover no-repeat;
+    color: white;
+    padding: 6rem 1rem;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    flex-shrink: 0;
+    opacity: 0.5;
+    /* Base dimmed opacity */
+    transition: opacity 0.8s ease-in-out;
+    /* Smooth fade */
+}
+
+.heroImage1 {
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)),
+        url('/tourism-analytics/images/landingbackgnd.png');
+}
+
+.heroImage2 {
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)),
+        url('/tourism-analytics/images/landingbackgnd2.png');
+}
+
+.heroImage3 {
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)),
+        url('/tourism-analytics/images/landingbackgnd3.png');
+}
+
+/* Wrapper hides overflow, stays same */
+.movingGroupWrapper {
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Group slides as before */
+.movingGroup {
+    display: flex;
+    width: 300vw;
+    animation: slideOneByOne 25s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+
+/* Keyframes for sliding group */
+@keyframes slideOneByOne {
+
+    0%,
+    30% {
+        transform: translateX(0%);
+    }
+
+    35%,
+    65% {
+        transform: translateX(-100vw);
+    }
+
+    70%,
+    100% {
+        transform: translateX(-200vw);
+    }
+}
+
+.hero:nth-child(1) {
+    animation: fadeInOut1 9s infinite;
+}
+
+.hero:nth-child(2) {
+    animation: fadeInOut2 9s infinite;
+}
+
+.hero:nth-child(3) {
+    animation: fadeInOut3 9s infinite;
+}
+
+
+@keyframes fadeInOut1 {
+
+    0%,
+    30% {
+        opacity: 1;
+    }
+
+    65%,
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInOut2 {
+
+    0%,
+    34% {
+        opacity: 1;
+    }
+
+    35%,
+    65% {
+        opacity: 1;
+    }
+
+    70%,
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeInOut3 {
+
+    0%,
+    69% {
+        opacity: 1;
+    }
+
+    70%,
+    95% {
+        opacity: 1;
+    }
+
+    96%,
+    100% {
+        opacity: 1;
+    }
 }

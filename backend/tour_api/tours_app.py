@@ -17,6 +17,8 @@ from payment_routes import payment_bp
 from booking_routes import confirm_bp
 from voucher_routes import send_confirmation_email
 
+from db_helpers import get_tour_from_db_by_slug, update_tour_in_db_by_id
+
 # Register MIME types
 mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("text/css", ".css")
@@ -75,8 +77,16 @@ print("🧪 HOTEL DB CONFIG:", hotels_db_config)
 
 app = Flask(__name__)
 # 🔧 Enable CORS on all routes starting with /api
-CORS(app, resources={r"/api/*": {"origins": "https://app.tourwise.shop"}})
-
+CORS(
+    app,
+    resources={
+        r"/api/*": {
+            "origins": "https://app.tourwise.shop",
+            "methods": ["GET", "POST", "PUT", "OPTIONS"],
+            "allow_headers": "*",
+        }
+    },
+)
 
 # ✅ Upload folder setup
 UPLOAD_FOLDER = "uploads"
@@ -108,55 +118,67 @@ def add_tour():
             image.save(os.path.join(app.config["UPLOAD_FOLDER"], image_filename))
 
         db = mysql.connector.connect(**tours_db_config)
-        with db.cursor() as cursor:
-            cursor.execute("SELECT id FROM tours WHERE slug = %s", (slug,))
-            if cursor.fetchone():
-                db.close()
-                return jsonify({"error": "Slug already exists"}), 400
+        cursor = db.cursor()
 
-            cursor.execute(
-                """
-                INSERT INTO tours (
-                    title, slug, location, price, description,
-                    start_date, end_date, available_slots, image, category_id
-                )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """,
-                (
-                    title,
-                    slug,
-                    location,
-                    price,
-                    description,
-                    start_date,
-                    end_date,
-                    available_slots,
-                    image_filename,
-                    category_id,
-                ),
+        # Check for slug duplication
+        cursor.execute("SELECT item_id FROM items WHERE slug = %s", (slug,))
+        if cursor.fetchone():
+            cursor.close()
+            db.close()
+            return jsonify({"error": "Slug already exists"}), 400
+
+        # Generate new item_id
+        cursor.execute("SELECT MAX(item_id) FROM items")
+        max_item_id = cursor.fetchone()[0] or 0
+        new_item_id = max_item_id + 2  # or +1 if +2 is not intended
+
+        # Insert into items
+        cursor.execute(
+            """
+            INSERT INTO items (
+                item_id, title, slug, location, price, description,
+                start_date, end_date, available_slots, image, category_id, item_type
             )
-            db.commit()
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (
+                new_item_id,
+                title,
+                slug,
+                location,
+                price,
+                description,
+                start_date,
+                end_date,
+                available_slots,
+                image_filename,
+                category_id,
+                "tour",
+            ),
+        )
+        db.commit()
 
-            # ✅ POST to Facebook
-            try:
-                time.sleep(2)
-                post_tour_to_facebook_internal(
-                    {
-                        "title": title,
-                        "description": description,
-                        "location": location,
-                        "price": price,
-                        "image_url": (
-                            f"https://api.tourwise.shop/uploads/{image_filename}"
-                            if image_filename
-                            else ""
-                        ),
-                        "slug": slug,
-                    }
-                )
-            except Exception as fb_err:
-                print("⚠️ Facebook auto-post failed:", fb_err)
+        # ✅ Try to auto-post to Facebook
+        try:
+            time.sleep(2)
+            post_tour_to_facebook_internal(
+                {
+                    "title": title,
+                    "description": description,
+                    "location": location,
+                    "price": price,
+                    "image_url": (
+                        f"https://api.tourwise.shop/uploads/{image_filename}"
+                        if image_filename
+                        else ""
+                    ),
+                    "slug": slug,
+                }
+            )
+        except Exception as fb_err:
+            print("⚠️ Facebook auto-post failed:", fb_err)
 
+        cursor.close()
         db.close()
 
         return jsonify({"message": "Tour added successfully"}), 201
@@ -181,9 +203,13 @@ def get_landing_data():
     with db_tours.cursor(dictionary=True) as cursor:
         cursor.execute(
             """
-            SELECT id, title, location, price, image, description, slug,
-                   start_date, end_date, available_slots
-            FROM tours;
+            (
+                SELECT * FROM vw_landing_page WHERE type = 'tour' ORDER BY id ASC LIMIT 3
+            )
+            UNION ALL
+            (
+                SELECT * FROM vw_landing_page WHERE type = 'hotel' ORDER BY id ASC LIMIT 3
+            );
         """
         )
         tours = cursor.fetchall()
@@ -210,22 +236,54 @@ def get_landing_data():
         processed_tours.append(tour)
 
     # Connect to hotels DB
-    db_hotels = mysql.connector.connect(**hotels_db_config)
-    with db_hotels.cursor(dictionary=True) as cursor:
+
+    return jsonify({"topItems": processed_tours})
+
+
+# ✅ Landing data
+@app.route("/api/tour-data")
+def get_tour_data():
+    print("👋 Tour data route called!", flush=True)
+
+    db_tours = mysql.connector.connect(**tours_db_config)
+    with db_tours.cursor(dictionary=True) as cursor:
         cursor.execute(
-            "SELECT name, slug, description, background_image AS image FROM hotels LIMIT 6"
+            """
+            (
+                SELECT * FROM vw_landing_page WHERE type = 'tour' ORDER BY id ASC
+            )
+            UNION ALL
+            (
+                SELECT * FROM vw_landing_page WHERE type = 'hotel' ORDER BY id ASC
+            );
+        """
         )
-        hotels = cursor.fetchall()
+        tours = cursor.fetchall()
 
-    db_hotels.close()
+    db_tours.close()
 
-    # ✅ Process hotels correctly (use /images/ for frontend-based images)
-    for hotel in hotels:
-        img = hotel.get("image", "")
-        path = img.lstrip("/") if img else ""
-        hotel["image"] = f"/images/{path}"
+    # Process tours
+    processed_tours = []
+    for tour in tours:
+        if not tour:
+            continue  # skip if None
 
-    return jsonify({"topTours": processed_tours, "hotels": hotels})
+        raw_image = (tour.get("image") or "").lstrip("/")
+
+        if raw_image.startswith("uploads/"):
+            tour["image"] = f"/{raw_image}"
+        elif raw_image.startswith("images/"):
+            tour["image"] = f"/{raw_image}"
+        elif raw_image:
+            tour["image"] = f"/uploads/{raw_image}"
+        else:
+            tour["image"] = ""
+
+        processed_tours.append(tour)
+
+    # Connect to hotels DB
+
+    return jsonify({"topTours": processed_tours})
 
 
 # # ✅ Get tour by slug (with history images)
@@ -235,12 +293,9 @@ def get_tour_by_slug(slug):
         db = mysql.connector.connect(**tours_db_config)
         with db.cursor(dictionary=True) as cursor:
             # 🔍 Get main tour info
-            print(
-                "📡 Querying tour by slug:",
-                "SELECT * FROM tours WHERE slug = %s LIMIT 1",
-                (slug,),
+            cursor.execute(
+                "SELECT * FROM vw_tour_page WHERE slug = %s LIMIT 1", (slug,)
             )
-            cursor.execute("SELECT * FROM tours WHERE slug = %s LIMIT 1", (slug,))
             tour = cursor.fetchone()
 
             if not tour:
@@ -259,7 +314,7 @@ def get_tour_by_slug(slug):
                 WHERE tour_id = %s
                 ORDER BY created_at DESC
             """,
-                (tour["id"],),
+                (tour["item_id"],),
             )
             history_images = cursor.fetchall()
 
@@ -280,7 +335,7 @@ def get_tour_by_slug(slug):
                 WHERE tour_id = %s
                 ORDER BY created_at DESC
             """,
-                (tour["id"],),
+                (tour["item_id"],),
             )
             videos = cursor.fetchall()
 
@@ -318,7 +373,7 @@ def update_tour(slug):
 
                 cursor.execute(
                     """
-                    UPDATE tours SET title=%s, location=%s, price=%s, description=%s,
+                    UPDATE items SET title=%s, location=%s, price=%s, description=%s,
                         start_date=%s, end_date=%s, available_slots=%s, category_id=%s, image=%s
                     WHERE slug=%s
                 """,
@@ -338,7 +393,7 @@ def update_tour(slug):
             else:
                 cursor.execute(
                     """
-                    UPDATE tours SET title=%s, location=%s, price=%s, description=%s,
+                    UPDATE items SET title=%s, location=%s, price=%s, description=%s,
                         start_date=%s, end_date=%s, available_slots=%s, category_id=%s
                     WHERE slug=%s
                 """,
@@ -454,8 +509,8 @@ def get_history_images(slug):
         """
         SELECT hi.id, hi.image_path AS filename, hi.caption, hi.category
         FROM tour_history_images hi
-        JOIN tours t ON hi.tour_id = t.id
-        WHERE t.slug = %s
+        JOIN items i ON hi.tour_id = i.item_id
+        WHERE i.slug = %s
     """,
         (slug,),
     )
@@ -521,11 +576,11 @@ def get_tour_videos(slug):
     try:
         db = mysql.connector.connect(**tours_db_config)
         with db.cursor(dictionary=True) as cursor:
-            cursor.execute("SELECT id FROM tours WHERE slug = %s", (slug,))
+            cursor.execute("SELECT item_id FROM vw_tour_page  WHERE slug = %s", (slug,))
             result = cursor.fetchone()
             if not result:
                 return jsonify({"error": "Tour not found"}), 404
-            tour_id = result["id"]
+            item_id = result["item_id"]
 
             cursor.execute(
                 """
@@ -534,7 +589,7 @@ def get_tour_videos(slug):
                 WHERE tour_id = %s
                 ORDER BY created_at DESC
             """,
-                (tour_id,),
+                (item_id,),
             )
             videos = cursor.fetchall()
 
@@ -552,16 +607,16 @@ def delete_tour_video(slug, video_id):
         db = mysql.connector.connect(**tours_db_config)
         with db.cursor() as cursor:
             # Verify tour exists
-            cursor.execute("SELECT id FROM tours WHERE slug = %s", (slug,))
+            cursor.execute("SELECT item_id FROM vw_tour_page WHERE slug = %s", (slug,))
             result = cursor.fetchone()
             if not result:
                 return jsonify({"error": "Tour not found"}), 404
-            tour_id = result[0]
+            item_id = result[0]
 
             # Delete the video
             cursor.execute(
                 "DELETE FROM tour_videos WHERE id = %s AND tour_id = %s",
-                (video_id, tour_id),
+                (video_id, item_id),
             )
             db.commit()
 
@@ -579,7 +634,7 @@ def delete_history_image_by_slug(slug, image_id):
     cursor = conn.cursor()
 
     # Optional: validate tour slug
-    cursor.execute("SELECT id FROM tours WHERE slug = %s", (slug,))
+    cursor.execute("SELECT item_id FROM vw_tour_page WHERE slug = %s", (slug,))
     tour = cursor.fetchone()
     if not tour:
         cursor.close()
@@ -629,7 +684,9 @@ def list_all_tours():
     try:
         db = mysql.connector.connect(**tours_db_config)
         with db.cursor(dictionary=True) as cursor:
-            cursor.execute("SELECT id, slug, title FROM tours ORDER BY title ASC")
+            cursor.execute(
+                "SELECT item_id, slug, title FROM vw_tour_page ORDER BY title ASC"
+            )
             tours = cursor.fetchall()
         db.close()
         return jsonify(tours)
@@ -646,8 +703,8 @@ def get_tour_history_images(slug):
             query = """
                 SELECT h.id, h.image_path AS url, h.caption, h.category
                 FROM tour_history_images h
-                JOIN tours t ON h.tour_id = t.id
-                WHERE t.slug = %s
+                JOIN items i ON h.tour_id = i.item_id
+                WHERE i.slug = %s
             """
             cursor.execute(query, (slug,))
             images = cursor.fetchall()
@@ -671,7 +728,7 @@ def get_categories():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/book", methods=["POST"])
+@app.route("/api/book", methods=["POST"])  # NEED FIX
 def book_tour():
     data = request.json
 
@@ -744,6 +801,17 @@ def book_tour():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route("/api/delete-tour/<int:tour_id>", methods=["DELETE"])
+def delete_tour(tour_id):
+    conn = mysql.connector.connect(**tours_db_config)
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM tours WHERE id=%s", (tour_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return jsonify({"message": "Tour deleted successfully"})
+
+
 @app.route("/api/tours-list", methods=["GET"])
 def get_tour_list():
     try:
@@ -751,9 +819,9 @@ def get_tour_list():
         with db.cursor(dictionary=True) as cursor:
             cursor.execute(
                 """
-                SELECT id, slug, title, description, image, price,
+                SELECT id, item_id, slug, title, description, image, price,
                     location, available_slots, start_date, end_date
-                FROM tours
+                FROM items where item_type = 'tour'
                 ORDER BY created_at DESC
                 """
             )
@@ -772,9 +840,101 @@ def get_tour_list():
 def get_tour_titles():
     db = get_db_connection()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT id, title, price, slug FROM tours")
+    cursor.execute(
+        "SELECT id, item_id, title, price, slug FROM items WHERE item_type = 'tour' ORDER BY title ASC"
+    )
     results = cursor.fetchall()
     return jsonify(results)
+
+
+@app.route("/api/tour-itinerary/<string:slug>", methods=["GET"])
+def get_tour_itinerary(slug):
+    tour = get_tour_from_db_by_slug(slug)  # You need to fetch using slug
+    return jsonify(tour)
+
+
+@app.route("/api/tour-itinerary/<string:slug>", methods=["PUT"])
+def update_tour_itinerary(slug):
+    data = request.get_json()
+
+    # ✅ Fetch item_id (tour ID) from vw_tour_page using slug
+    conn = mysql.connector.connect(**tours_db_config)
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT item_id FROM vw_tour_page WHERE slug = %s", (slug,))
+    result = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not result:
+        return jsonify({"error": "Tour not found"}), 404
+
+    tour_id = result["item_id"]  # ✅ Extract the real tour ID
+
+    # ✅ Validate itinerary format
+    if not isinstance(data.get("tour_itinerary", []), list):
+        return jsonify({"error": "Invalid itinerary format"}), 400
+
+    # ✅ Update using ID instead of slug
+    update_tour_in_db_by_id(tour_id, data)
+    return jsonify({"message": "Tour updated"})
+
+
+from flask_cors import cross_origin
+
+
+@app.route("/api/tour-tips/<slug>", methods=["GET", "PUT", "OPTIONS"])
+@cross_origin(
+    origins=["https://app.tourwise.shop"],
+    methods=["GET", "PUT", "OPTIONS"],
+    allow_headers="*",
+)
+def tour_tips(slug):
+    if request.method == "GET":
+        # You can implement GET logic here if needed
+        ...
+
+    elif request.method == "PUT":
+        print("✅ PUT request to /api/tour-tips received")
+        try:
+            data = request.get_json()
+            print("📥 Data received:", data)
+
+            if not data or "tips" not in data:
+                return jsonify({"error": "Missing tips in request"}), 400
+
+            new_tips = data["tips"]
+            print("📝 New tips:", new_tips)
+
+            # ✅ Fetch item_id from vw_tour_page using slug
+            conn = mysql.connector.connect(**tours_db_config)
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("SELECT item_id FROM vw_tour_page WHERE slug = %s", (slug,))
+            result = cursor.fetchone()
+
+            if not result:
+                cursor.close()
+                conn.close()
+                return jsonify({"error": "Tour not found"}), 404
+
+            tour_id = result["item_id"]
+            cursor.close()
+
+            # ✅ Update tips in tours table using the real tour_id
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE tours SET tips = %s WHERE id = %s", (new_tips, tour_id)
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            return jsonify({"message": "Tips updated successfully"})
+
+        except Exception as e:
+            print("❌ Exception while saving tips:", e)
+            return jsonify({"error": "Failed to update tips"}), 500
+
+    return "", 204
 
 
 app.register_blueprint(fb_bp, url_prefix="/api/fb")

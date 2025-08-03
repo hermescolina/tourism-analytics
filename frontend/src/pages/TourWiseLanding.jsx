@@ -1,73 +1,37 @@
 import { useEffect, useState } from 'react';
-import { apiBaseTour } from '../config';
+import { apiBaseTour, frontendBase } from '../config';
 import { useNavigate } from 'react-router-dom';
 import styles from './TourWiseLanding.module.css';
+
 import '@fortawesome/fontawesome-free/css/all.min.css';
 
 
-const base = '/tourism-analytics';
+const base = `${frontendBase}/tourism-analytics`;
+const baseurl = `${apiBaseTour}/uploads`;
 
 const isValidUrl = (str) => str.startsWith('http://') || str.startsWith('https://');
 
 const getStaticImageUrl = (path) => {
+    console.log("🖼️ Image path:", path);
     if (!path) return '';
     if (isValidUrl(path)) return path;
     const cleaned = path.startsWith('/') ? path : `/${path}`;
-    return cleaned.startsWith('/uploads/')
-        ? `${apiBaseTour}${cleaned}`
-        : `${base}${cleaned}`;
+    return cleaned.startsWith('/images/')
+        ? `${base}${cleaned}`
+        : `${baseurl}${cleaned}`;
 };
 
-// Restore from localStorage before hooks run
-// const savedLang = localStorage.getItem('selectedLanguage');
-// const savedCurrency = localStorage.getItem('selectedCurrency');
-
-// console.log("apiBaseTour URL:", `${apiBaseTour}`);
-
-// console.log("Base URL:", `${base}`);
 
 export default function TourWiseLanding() {
-    const [tours, setTours] = useState([]);
-    const [hotels, setHotels] = useState([]);
+    const [items, setItems] = useState(null);
     const navigate = useNavigate();
     const [language, setLanguage] = useState('');
     const [showLangBanner, setShowLangBanner] = useState(true);
     const [languagesList, setLanguagesList] = useState([]);
     const [languageFlags, setLanguageFlags] = useState({});
-    // const [languageCodeMap, setLanguageCodeMap] = useState({
-    //     Arabic: 'ar',
-    //     Bengali: 'bn',
-    //     Chinese: 'zh',
-    //     English: 'en',
-    //     French: 'fr',
-    //     German: 'de',
-    //     Hindi: 'hi',
-    //     Hungarian: 'hu',
-    //     Indonesian: 'id',
-    //     Italian: 'it',
-    //     Japanese: 'ja',
-    //     Korean: 'ko',
-    //     Portuguese: 'pt',
-    //     Russian: 'ru',
-    //     Spanish: 'es',
-    //     Tagalog: 'tl',
-    // });
 
-    // const [translatedWelcome, setTranslatedWelcome] = useState('Welcome!');
     const [currency, setCurrency] = useState('USD');
     const [currencyList, setCurrencyList] = useState({});
-
-
-
-    // const currencySymbols = {
-    //     USD: '$',
-    //     EUR: '€',
-    //     PHP: '₱',
-    //     JPY: '¥',
-    //     GBP: '£',
-    //     AUD: 'A$',
-    //     CAD: 'C$'
-    // };
 
 
     useEffect(() => {
@@ -180,13 +144,14 @@ export default function TourWiseLanding() {
                 return res.json();
             })
             .then(data => {
-                console.log("✅ Fetched API data:", data);
-                console.log("🏨 Raw hotels from API:", data.hotels); // TRACE LOG
-                setTours(data.topTours);
-                setHotels(data.hotels);
+                console.log("📥 API response data:", data);
+                console.log("🗂 Top items to set:", data.topItems || []);
+                setItems(data.topItems || []);
+                // setHotels(data.hotels);
             })
             .catch(err => {
                 console.error('❌ Failed to fetch from API:', err);
+                setItems([]); // ✅ prevents infinite loading if API fails
             });
     }, []);
 
@@ -213,13 +178,13 @@ export default function TourWiseLanding() {
                     {menuOpen && (
                         <div className={styles.dropdownMenu}>
                             <div className={styles.menuGroup}>
-                                <strong>Tours</strong>
+                                <strong>items</strong>
                                 <a href={`${base}/tour-cards`} target="_blank" rel="noopener noreferrer">
                                     <i className="fas fa-map-marked-alt" style={{ marginRight: '0.5rem' }}></i>
                                     View Tours
                                 </a>
 
-                                <a href={`${base}/admin/tours`} target="_blank" rel="noopener noreferrer">
+                                <a href={`${base}/admin/items`} target="_blank" rel="noopener noreferrer">
                                     <i className="fas fa-plus" style={{ marginRight: '0.5rem' }}></i>
                                     Add New Tours
                                 </a>
@@ -228,9 +193,6 @@ export default function TourWiseLanding() {
                                     <i className="fas fa-photo-video" style={{ marginRight: '0.5rem' }}></i>
                                     Update Tours Media
                                 </a>
-
-
-
                             </div>
 
                             <div className={styles.menuGroup}>
@@ -260,8 +222,12 @@ export default function TourWiseLanding() {
     };
 
 
-    if (!tours.length && !hotels.length) {
-        return <p>Loading data or none available...</p>;
+    // ✅ Show loading or empty state
+    if (!items) {
+        return <p>Loading data...</p>; // API still fetching
+    }
+    if (items.length === 0) {
+        return <p>No data available.</p>; // API returned no items
     }
 
 
@@ -304,73 +270,113 @@ export default function TourWiseLanding() {
             )}
 
             <Navbar />
-
-            <section className={styles.hero}>
-                <div className={styles.heroContent}>
-                    <h1>Explore the World with TourWise</h1>
-                    <p>Discover amazing destinations and tours tailored for you.</p>
-                    <button className={styles.btnPrimary} onClick={() => window.open(`${base}/bookpage`, '_blank')}>Book Now</button>
-                </div>
-                <div className={styles.scrollIndicator}>⌄</div>
-            </section>
-
+            <div className={styles.movingGroup}>
+                <section className={`${styles.hero} ${styles.heroImage1}`}>
+                    <div className={styles.heroContent}>
+                        <h1>Explore the World with TourWise</h1>
+                        <p>Discover amazing destinations and items tailored for you.</p>
+                        {/* <button className={styles.btnPrimary} onClick={() => window.open(`${base}/bookpage`, '_blank')}>Book Now</button> */}
+                    </div>
+                    <div className={styles.scrollIndicator}>⌄</div>
+                </section>
+                <section className={`${styles.hero} ${styles.heroImage2}`}>
+                    <div className={styles.heroContent}>
+                        <h1>Explore the World with TourWise</h1>
+                        <p>Discover amazing destinations and items tailored for you.</p>
+                        {/* <button className={styles.btnPrimary} onClick={() => window.open(`${base}/bookpage`, '_blank')}>Book Now</button> */}
+                    </div>
+                    <div className={styles.scrollIndicator}>⌄</div>
+                </section>
+                <section className={`${styles.hero} ${styles.heroImage3}`}>
+                    <div className={styles.heroContent}>
+                        <h1>Explore the World with TourWise</h1>
+                        <p>Discover amazing destinations and items tailored for you.</p>
+                        {/* <button className={styles.btnPrimary} onClick={() => window.open(`${base}/bookpage`, '_blank')}>Book Now</button> */}
+                    </div>
+                    <div className={styles.scrollIndicator}>⌄</div>
+                </section>
+            </div>
 
             <section className={styles.sectionFeatured}>
                 <h2 className={styles.sectionTitle}>Top Destinations</h2>
                 <div className={styles.tourCards}>
-                    {tours.map((tour, index) => {
-                        console.log("📸 Tour image URL:", getStaticImageUrl(tour.image));
-                        return (
-                            <div
-                                className={styles.tourCard}
-                                key={index}
-                                onClick={() => navigate(`/tour/${tour.slug}`)}
-                            >
-                                <img
-                                    src={getStaticImageUrl(tour.image)}
-                                    alt={tour.title}
-                                    className={styles.tourImage}
-                                />
-                                <div className={styles.tourInfo}>
-                                    <h3>{tour.title}</h3>
-                                    <p className={styles.description}>{tour.description || 'No description available.'}</p>
-                                    {tour.location && <p className={styles.location}>{tour.location}</p>}
-                                    <p className={styles.price}>
-                                        {/* {currencySymbols[currency] || ''} */}
-                                        {Number(tour.price).toLocaleString(undefined, {
-                                            minimumFractionDigits: 2,
-                                        })}
-                                    </p>
+                    {items
+                        .filter(item => item.type === 'tour') // ✅ Show only tours
+                        .map((tour, index) => {
+                            console.log("📸 Tour image URL:", getStaticImageUrl(tour.image));
+                            return (
+                                <div
+                                    className={styles.tourCard}
+                                    key={index}
+                                    onClick={() => navigate(`/tour/${tour.slug}`)}
+                                >
+                                    {console.log("TOUR IMAGE URL:", tour.card_image)}
+                                    {console.log("TOUR IMAGE URL_:", getStaticImageUrl(tour.card_image))}
+                                    {tour.card_image && (
+                                        <img
+                                            src={getStaticImageUrl(tour.card_image)}
+                                            alt={tour.title || 'No title'}
+                                            className={styles.tourImage}
+                                        />
+                                    )}
+
+                                    <div className={styles.tourInfo}>
+                                        <h3>{tour.title}</h3>
+                                        <p className={styles.description}>{tour.description || 'No description available.'}</p>
+                                        {tour.location && <p className={styles.location}>{tour.location}</p>}
+                                        <p className={styles.price}>
+                                            {Number(tour.price).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                            })}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        );
-                    })}
+                            );
+                        })}
                 </div>
             </section>
+
 
 
             <section className={styles.sectionFeatured}>
                 <h2 className={styles.sectionTitle}>Top Hotels</h2>
                 <div className={styles.tourCards}>
-                    {hotels.map((hotel, index) => (
-                        <div
-                            className={styles.tourCard}
-                            key={index}
-                            onClick={() => navigate(`/hotel/${hotel.slug}`)}
-                        >
-                            <img
-                                src={getStaticImageUrl(hotel.image)}
-                                alt={hotel.name}
-                                className={styles.tourImage}
-                            />
-                            <div className={styles.tourInfo}>
-                                <h3>{hotel.name}</h3>
-                                <p className={styles.description}>{hotel.description || 'No description available.'}</p>
+                    {items
+                        .filter(item => item.type === 'hotel') // ✅ Show only hotels
+                        .map((hotel, index) => (
+                            <div
+                                className={styles.tourCard}
+                                key={index}
+                                onClick={() => navigate(`/hotel/${hotel.slug}`)}
+                            >
+                                {console.log("HOTEL IMAGE URL:", hotel.card_image)}
+                                {console.log("HOTEL IMAGE URL_:", getStaticImageUrl(hotel.card_image))}
+                                {hotel.card_image && ( // ✅ Use correct field: card_image (from API)
+                                    <img
+                                        src={getStaticImageUrl(hotel.card_image)}
+                                        alt={hotel.name || 'Hotel Image'}
+                                        className={styles.tourImage}
+                                    />
+                                )}
+                                <div className={styles.tourInfo}>
+                                    <h3>{hotel.name}</h3>
+                                    <p className={styles.description}>
+                                        {hotel.description || 'No description available.'}
+                                    </p>
+                                    {hotel.location && <p className={styles.location}>{hotel.location}</p>}
+                                    {hotel.price && (
+                                        <p className={styles.price}>
+                                            {Number(hotel.price).toLocaleString(undefined, {
+                                                minimumFractionDigits: 2,
+                                            })}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
                 </div>
             </section>
+
 
             <section className={styles.sectionTips}>
                 <h2 className={styles.sectionTitle}>Travel Tips</h2>
@@ -380,6 +386,6 @@ export default function TourWiseLanding() {
                     <p>Explore the world in comfort — your perfect trip starts here.</p>
                 </div>
             </section>
-        </div>
+        </div >
     );
 }

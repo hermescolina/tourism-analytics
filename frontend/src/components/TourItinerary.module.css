@@ -1,0 +1,22 @@
+.itineraryContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.itineraryCard {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.stopList {
+  margin: 0.5rem 0 0.5rem 1rem;
+  padding: 0;
+}
+
+.time {
+  font-style: italic;
+  color: #444;
+}

@@ -95,6 +95,7 @@ def generate_reference_id():
 @cart_bp.route("/book-cart", methods=["POST"])
 def book_cart():
     data = request.get_json()
+    print("📥 RAW Payload:", data)  # Full JSON received
     reference_id = data.get("reference_id") or generate_reference_id()
     user_id = data.get("user_id")
     bookings = data.get("bookings", [])
@@ -184,132 +185,83 @@ def confirm_booking(reference_id):
 @cart_bp.route("/cart", methods=["POST"])
 def add_to_cart():
     data = request.get_json()
-    item_type = data["item_type"]
-    item_id = data["item_id"]
-    quantity = data.get("quantity", 1)
+
     user_id = data.get("user_id")
+    item_id = data.get("item_id")  # ✅ This comes from items.id
+    item_type = data.get("item_type")
+    quantity = data.get("quantity", 1)
+    selected_date = data.get("selected_date")
 
-    # Determine DB and table based on item_type
-    db_map = {
-        "tour": {"db": tours_db_config, "table": "tours"},
-        "hotel": {"db": hotels_db_config, "table": "hotels"},
-        "car": {"db": cars_db_config, "table": "cars"},
-    }
+    if not all([user_id, item_id, item_type, selected_date]):
+        return jsonify({"error": "Missing required fields"}), 400
 
-    if item_type not in db_map:
-        return jsonify({"error": "Invalid item type"}), 400
+    db = mysql.connector.connect(**tours_db_config)
+    cursor = db.cursor(dictionary=True)
 
-    try:
-        # ✅ Single connection
-        db = mysql.connector.connect(**db_map[item_type]["db"])
-        lookup_cursor = db.cursor()
-        insert_cursor = db.cursor()
+    # ✅ Corrected lookup: match on items.id NOT items.item_id
+    cursor.execute(
+        """
+        SELECT item_id, title, slug, price, vendor_id
+        FROM items
+        WHERE item_id = %s AND item_type = %s
+    """,
+        (item_id, item_type),
+    )
 
-        table = db_map[item_type]["table"]
+    item = cursor.fetchone()
+    if not item:
+        return jsonify({"error": "Item not found"}), 404
 
-        # ✅ Lookup item
-        lookup_cursor.execute(
-            f"SELECT price, slug, vendor_id FROM {table} WHERE id = %s", (item_id,)
-        )
-        result = lookup_cursor.fetchone()
+    total_price = float(item["price"]) * quantity
 
-        if not result:
-            return jsonify({"error": "Item not found"}), 404
+    # ✅ Insert into cart
+    cursor.execute(
+        """
+        INSERT INTO cart (user_id, vendor_id, item_type, item_id, item_code, quantity, selected_date, total_price)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """,
+        (
+            user_id,
+            item["vendor_id"],
+            item_type,
+            item_id,
+            item["slug"],
+            quantity,
+            selected_date,
+            total_price,
+        ),
+    )
 
-        price, slug, vendor_id = result
-        total_price = float(price) * quantity
+    db.commit()
 
-        # ✅ Check if item already in cart
-        insert_cursor.execute(
-            """
-            SELECT id, quantity FROM cart WHERE user_id = %s AND item_type = %s AND item_id = %s
-        """,
-            (user_id, item_type, item_id),
-        )
-        existing = insert_cursor.fetchone()
-
-        if existing:
-            new_quantity = existing[1] + quantity
-            insert_cursor.execute(
-                """
-                UPDATE cart SET quantity = %s, total_price = %s WHERE id = %s
-            """,
-                (new_quantity, float(price) * new_quantity, existing[0]),
-            )
-        else:
-            insert_cursor.execute(
-                """
-                INSERT INTO cart (user_id, item_type, item_id, item_code, quantity, total_price, vendor_id)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-            """,
-                (user_id, item_type, item_id, slug, quantity, total_price, vendor_id),
-            )
-
-        db.commit()
-        return jsonify({"message": "Item added to cart", "total_price": total_price})
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-    finally:
-        try:
-            lookup_cursor.close()
-            insert_cursor.close()
-            db.close()
-        except BaseException:
-            pass
+    return (
+        jsonify(
+            {
+                "cart_item": {
+                    "item_id": item_id,
+                    "item_type": item_type,
+                    "quantity": quantity,
+                    "selected_date": selected_date,
+                    "total_price": total_price,
+                },
+                "message": "Item added to cart",
+            }
+        ),
+        200,
+    )
 
 
 @cart_bp.route("/cart/<int:user_id>", methods=["GET"])
 def get_cart(user_id):
     try:
-        # Get DB names from .env
-        tour_db = os.getenv("TOUR_DB_NAME")
-        hotel_db = os.getenv("HOTEL_DB_NAME")
-        car_db = os.getenv("CAR_DB_NAME")
-
         db = mysql.connector.connect(**tours_db_config)
         cursor = db.cursor(dictionary=True)
 
-        query = f"""
-            SELECT
-                {tour_db}.cart.id,
-                {tour_db}.cart.user_id,
-                {tour_db}.cart.vendor_id,
-                {tour_db}.cart.item_type,
-                {tour_db}.cart.item_id,
-                {tour_db}.cart.item_code,
-                {tour_db}.cart.quantity,
-                {tour_db}.cart.total_price,
-                {tour_db}.cart.created_at,
-
-                -- Tour fields
-                {tour_db}.tours.title AS tour_title,
-                {tour_db}.tours.image AS tour_image,
-                {tour_db}.tours.price AS tour_price,
-
-                -- Hotel fields
-                {hotel_db}.hotels.name AS hotel_name,
-                {hotel_db}.hotels.card_image AS hotel_image,
-                {hotel_db}.hotels.price AS hotel_price,
-
-                -- Car fields
-                {car_db}.cars.model AS car_model,
-                {car_db}.cars.card_image AS car_image,
-                {car_db}.cars.price_per_day AS car_price
-
-            FROM {tour_db}.cart
-
-            LEFT JOIN {tour_db}.tours
-                ON {tour_db}.cart.item_type = 'tour' AND {tour_db}.cart.item_id = {tour_db}.tours.id
-
-            LEFT JOIN {hotel_db}.hotels
-                ON {tour_db}.cart.item_type = 'hotel' AND {tour_db}.cart.item_id = {hotel_db}.hotels.hotel_id
-
-            LEFT JOIN {car_db}.cars
-                ON {tour_db}.cart.item_type = 'car' AND {tour_db}.cart.item_id = {car_db}.cars.car_id
-
-            WHERE {tour_db}.cart.user_id = %s;
+        # Query from vw_cart_details view
+        query = """
+            SELECT *
+            FROM vw_cart_details
+            WHERE user_id = %s;
         """
         cursor.execute(query, (user_id,))
         cart_items = cursor.fetchall()
