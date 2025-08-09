@@ -2,6 +2,48 @@
     outline: 1px solid red;
 } */
 
+.guideSection {
+    margin-top: 2rem;
+}
+
+.guideList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.guideCard {
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 1rem;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.guidePhoto {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 0.8rem;
+}
+
+.contactGuideButton {
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.8rem;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.contactGuideButton:hover {
+    background: #0056b3;
+}
+
+
 .dayOverlay {
     position: absolute;
     top: 20px;
@@ -265,9 +307,7 @@
 }
 
 
-.left {}
-
-.right {}
+/* .right {} */
 
 
 .left .historyImage {

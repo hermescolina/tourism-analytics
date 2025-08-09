@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import { createContext, useContext, useState } from 'react';
 import { apiBaseTour } from '../config';
 
@@ -44,11 +45,27 @@ export function CartProvider({ children }) {
 
                 setCartItems((prevItems) => [...prevItems, item]);
             } else {
-                alert(data.error || 'Failed to add to cart');
+                console.log('❌ Failed to add to cart:', data.error || 'Unknown error');
+                if (data.error === "Missing required fields") {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Missing Required Fields',
+                        text: '⚠️ Please select all required fields before adding to cart.',
+                        confirmButtonColor: '#f1c40f', // yellow confirm button
+                    });
+                    return; // ⛔ Stop execution here
+                }
+
             }
         } catch (error) {
             console.error('Add to cart error:', error);
-            alert('Something went wrong while adding to cart.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong while adding to cart.',
+                confirmButtonColor: '#d33', // red confirm button
+            });
+
         }
     };
 
@@ -111,7 +128,7 @@ export function CartProvider({ children }) {
 
 
 
-    const clearCart = async () => {
+    const clearCart = async (userId, delete_all = false) => {
         setCartItems([]);
 
         try {
@@ -120,6 +137,7 @@ export function CartProvider({ children }) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                body: JSON.stringify({ user_id: userId, delete_all }) // ✅ Pass user_id in request body
             });
 
             if (!response.ok) {
@@ -134,6 +152,7 @@ export function CartProvider({ children }) {
             alert('An error occurred while clearing the cart.');
         }
     };
+
 
     return (
         <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, loadCart, clearCart }}>

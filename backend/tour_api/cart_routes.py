@@ -1,3 +1,4 @@
+from flask_cors import cross_origin
 from flask import Blueprint, request, jsonify
 import mysql.connector
 from datetime import datetime
@@ -6,7 +7,6 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
-
 
 # Define the Blueprint
 cart_bp = Blueprint("cart", __name__)
@@ -182,6 +182,34 @@ def confirm_booking(reference_id):
     return "🎉 Booking confirmed!"
 
 
+@cart_bp.route("/confirm-booking-cart", methods=["PUT"])
+def confirm_booking_cart():
+    data = request.get_json()
+    cart_id = data.get("id")  # ✅ Extract cart ID
+    user_id = data.get("user_id")
+    item_id = data.get("item_id")
+    item_type = data.get("item_type")
+    is_confirmed = data.get("is_confirmed", True)  # ✅ Default True if not passed
+
+    if not cart_id or not user_id or not item_id or not item_type:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    db = mysql.connector.connect(**tours_db_config)
+    cursor = db.cursor()
+
+    cursor.execute(
+        """
+        UPDATE cart 
+        SET is_confirmed=%s, confirmed_at=IF(%s=TRUE, NOW(), NULL) 
+        WHERE id=%s AND user_id=%s AND item_id=%s AND item_type=%s
+        """,
+        (is_confirmed, is_confirmed, cart_id, user_id, item_id, item_type),
+    )
+    db.commit()
+
+    return jsonify({"message": "Updated booking confirmation status."}), 200
+
+
 @cart_bp.route("/cart", methods=["POST"])
 def add_to_cart():
     data = request.get_json()
@@ -278,7 +306,12 @@ def get_cart(user_id):
             db.close()
 
 
-@cart_bp.route("/cart", methods=["DELETE"])
+@cart_bp.route("/cart", methods=["DELETE", "OPTIONS"])
+@cross_origin(
+    origins=["https://app.tourwise.shop"],
+    methods=["DELETE", "OPTIONS"],
+    allow_headers="*",
+)
 def delete_cart_item():
     data = request.get_json()
 
@@ -321,23 +354,38 @@ def delete_cart_item():
             pass
 
 
-@cart_bp.route("/clear-cart", methods=["DELETE"])
+@cart_bp.route("/clear-cart", methods=["DELETE", "OPTIONS"])
+@cross_origin(
+    origins=["https://app.tourwise.shop"],
+    methods=["DELETE", "OPTIONS"],
+    allow_headers="*",
+)
 def clear_cart_item():
+    # ✅ Return early for OPTIONS preflight
+    if request.method == "OPTIONS":
+        return jsonify({"message": "Preflight check successful"}), 200
 
     try:
+        data = request.get_json()  # Get JSON body (must include user_id)
+        user_id = data.get("user_id")
+
+        if not user_id:
+            return jsonify({"error": "Missing user_id"}), 400
+
         conn = mysql.connector.connect(**tours_db_config)
         cursor = conn.cursor()
 
         query = """
-            DELETE FROM cart
+            DELETE FROM cart 
+            WHERE user_id = %s AND is_confirmed = 1
         """
-        cursor.execute(query)
+        cursor.execute(query, (user_id,))
         conn.commit()
 
         return jsonify({"message": "Items successfully deleted from cart"}), 200
 
     except Exception as e:
-        print(f"Error deleting cart item: {e}")
+        print(f"❌ Error deleting cart item: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
     finally:

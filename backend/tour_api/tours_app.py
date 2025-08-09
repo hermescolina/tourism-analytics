@@ -15,7 +15,9 @@ from cart_routes import cart_bp
 from voucher_routes import voucher_bp
 from payment_routes import payment_bp
 from booking_routes import confirm_bp
+from tour_routes import tours_bp
 from voucher_routes import send_confirmation_email
+
 
 from db_helpers import get_tour_from_db_by_slug, update_tour_in_db_by_id
 
@@ -82,11 +84,12 @@ CORS(
     resources={
         r"/api/*": {
             "origins": "https://app.tourwise.shop",
-            "methods": ["GET", "POST", "PUT", "OPTIONS"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": "*",
         }
     },
 )
+
 
 # ✅ Upload folder setup
 UPLOAD_FOLDER = "uploads"
@@ -942,6 +945,7 @@ app.register_blueprint(cart_bp, url_prefix="/api/cr")
 app.register_blueprint(payment_bp, url_prefix="/api/pay")
 app.register_blueprint(confirm_bp, url_prefix="/api/cf")
 app.register_blueprint(voucher_bp, url_prefix="/api/vr")
+app.register_blueprint(tours_bp, url_prefix="/api/tr")
 
 
 # ✅ Run locally or with Gunicorn/Render

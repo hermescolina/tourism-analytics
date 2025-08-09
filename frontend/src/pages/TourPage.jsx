@@ -2,9 +2,11 @@ import { apiBaseTour, frontendBase } from '../config';
 import { useRef, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import styles from './TourPage.module.css';
+import './TourPage.css' // This is used for the video player styles
 import VideoPlayer from '../components/VideoPlayer';
 import TourItinerary from '../components/TourItinerary';
 import WhatsIncluded from '../components/WhatsIncluded';
+import ShareMenu from "../components/ShareMenu";
 
 const base = '/tourism-analytics';
 const apiBase = apiBaseTour;
@@ -22,6 +24,16 @@ export default function TourPage() {
     const [selectedCategory, setSelectedCategory] = useState("Tour Videos");
     const [tourVideos, setTourVideos] = useState([]);
     const [showOverlay, setShowOverlay] = useState(false);
+
+    const dateInputRef = useRef(null);
+    const [selectedDate, setSelectedDate] = useState("");
+
+    const [showMenu, setShowMenu] = useState(false);
+
+    const [guides, setGuides] = useState([]);
+    const [vendor, setVendor] = useState(null);
+    const [loading, setLoading] = useState(false);
+
 
 
 
@@ -47,9 +59,6 @@ export default function TourPage() {
                 setError('Tour not found or server error.');
             });
     }, [slug]);
-
-
-
 
     useEffect(() => {
         const handleScroll = () => {
@@ -92,20 +101,13 @@ export default function TourPage() {
                         el.style.opacity = '';
                     }
                 });
-
             }
-
             lastScrollY = currentScrollY;
         };
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
-
-
-
-
-
 
     const backgroundVideos = tourVideos.filter(v => v.category === 'Tour Videos' && v.video_id).slice(0, 3);
 
@@ -120,16 +122,84 @@ export default function TourPage() {
     }, [backgroundVideos.length]);
 
 
+    useEffect(() => {
+        if (!tour?.item_id) return; // ✅ Safe guard with optional chaining
+        console.log("Selected Category TOUR ID:", tour.item_id);
+
+        fetch(`https://api.tourwise.shop/api/tr/tours/${tour.item_id}/guides`)
+            .then(res => res.json())
+            .then(data => {
+                console.log("Guides API Response:", data);
+                setGuides(data.guides || []);
+            })
+            .catch(err => console.error("Error fetching guides:", err));
+    }, [tour]);
+
+    console.log("Selected Category VENDOR ID:", tour?.vendor_id);
+    useEffect(() => {
+        console.log("📌 Tour data:", tour); // Log tour to confirm vendor_id presence
+
+        if (!tour || !tour?.vendor_id) {
+            console.log("⚠️ No tour or vendor_id found, skipping vendor fetch.");
+            return;
+        }
+
+        async function fetchVendor() {
+            console.log(`📡 Fetching vendor with ID: ${tour?.vendor_id}`);
+            setLoading(true);
+            try {
+                const response = await fetch(`https://api.tourwise.shop/api/tr/vendors/${tour.vendor_id}`);
+                console.log("🔗 Vendor API URL:", response.url);
+
+                if (!response.ok) throw new Error(`Failed to fetch vendor: ${response.status}`);
+                const data = await response.json();
+
+                console.log("✅ Vendor data received:", data);
+
+                // Convert certifications and awards to arrays
+                data.certifications = data.certifications
+                    ? data.certifications.split(",").map((c) => c.trim())
+                    : [];
+                data.awards = data.awards
+                    ? data.awards.split(",").map((a) => a.trim())
+                    : [];
+
+                setVendor(data);
+            } catch (err) {
+                console.error("❌ Error fetching vendor:", err);
+                setVendor(null);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchVendor();
+    }, [tour]);
+
+
+
 
     if (error) return <div className={styles.tourContainer}>{error}</div>;
     if (!tour) return <div className={styles.tourContainer}>Loading...</div>;
+
 
     const imagePath = tour.image || '';
     const imageUrl = imagePath.startsWith('/uploads/images/')
         ? `${urlBase}${imagePath.replace('/uploads', '')}`
         : `${apiBase}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
 
-    const categories = ["Tips for Visitors", "Tour Itinerary", "About the Tour", "What to Expect", "History and Culture", "Tour Videos"];
+    const categories = [
+        "Tips for Visitors",
+        "Tour Itinerary",
+        "About the Tour",
+        "What to Expect",
+        "History and Culture",
+        "Tour Videos",
+        "Tour Guides",
+        "Tour Owner Info" // 👈 Added new category
+    ];
+
+
 
 
     const handleCategoryChange = (e) => {
@@ -185,6 +255,48 @@ export default function TourPage() {
     };
 
 
+
+    const handleAddToCart = async () => {
+        if (!selectedDate) {
+            // Trigger the date picker if date not selected
+            dateInputRef.current.showPicker();
+            return;
+        }
+
+        try {
+            const payload = {
+                user_id: 1,                // Replace with actual user ID
+                item_type: "tour",
+                item_id: tour.item_id,
+                quantity: 1,
+                selected_date: selectedDate
+            };
+
+            console.log("🛒 Adding to cart with payload:", payload);
+
+            const response = await fetch(`${apiBaseTour}/api/cr/cart`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert("✅ Added to cart successfully!");
+                window.location.href = `${base}/tour-cards`;
+            } else {
+                alert(`❌ Failed to add: ${data.error || "Unknown error"}`);
+            }
+        } catch (err) {
+            console.error("❌ Error adding to cart:", err);
+            alert("Network or server error.");
+        }
+    };
+
+
+
+
     return (
         <div className={styles.tourContainer}>
             <header className={styles.browseHeader}>
@@ -198,10 +310,37 @@ export default function TourPage() {
                 </div>
                 <h1 className={styles.browseTitleInline}>{tour.title}</h1>
                 <div className={styles.tourActions}>
-                    <button className={styles.actionButton} onClick={() => window.open(`${base}/bookpage`, '_blank')}>Book Now</button>
-                    <button className={styles.actionButton}>Share</button>
+                    {/* Hidden Date Picker */}
+                    <input
+                        type="date"
+                        ref={dateInputRef}
+                        style={{ display: "none" }}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                    />
+
+                    {/* Add to Cart Button */}
+
+
+                    <button
+                        className={styles.actionButton}
+                        onClick={handleAddToCart}  // ✅ Only one onClick here
+                    >
+                        Add to Cart
+                    </button>
+
+
+                    <button
+                        className={styles.actionButton}
+                        onClick={() => setShowMenu(!showMenu)}
+                    >
+                        Share
+                    </button>
+
+                    <ShareMenu showMenu={showMenu} onClose={() => setShowMenu(false)} />
+
                     <button className={styles.actionButton}>Contact Guide</button>
                 </div>
+
             </header>
 
 
@@ -361,40 +500,144 @@ export default function TourPage() {
                 )
             }
 
+            {selectedCategory === "Tour Itinerary" && (
+                <>
+                    {tour.inclusions && tour.inclusions.length > 0 && (
+                        <section className={styles.tourSection}>
+                            <h2>What’s Included</h2>
+                            <WhatsIncluded
+                                inclusions={tour.inclusions.split(';')}
+                                exclusions={tour.exclusions?.split(';') || []}
+                            />
+                        </section>
+                    )}
 
-            {tour.inclusions && tour.inclusions.length > 0 && (
-                <section className={styles.tourSection}>
-                    <h2>What’s Included</h2>
-                    <WhatsIncluded
-                        inclusions={tour.inclusions.split(';')}
-                        exclusions={tour.exclusions?.split(';') || []}
-                    />
-                </section>
+                    {tour.tour_itinerary && tour.tour_itinerary.length > 0 && (
+                        <section className={styles.tourSection}>
+                            <h2>Tour Itinerary</h2>
+                            <TourItinerary itineraries={JSON.parse(tour.tour_itinerary || '[]')} />
+                        </section>
+                    )}
+                </>
+            )}
+
+
+            {selectedCategory === "Tour Guides" && (
+                <div className={styles.guideSection}>
+                    <h3>🧑‍✈️✈️ Meet Your Tour Guides</h3>
+                    {guides.length === 0 ? (
+                        <p>No guides assigned yet for this tour.</p>
+                    ) : (
+                        <div className={styles.guideList}>
+                            {guides.map((guide) => (
+                                <div key={guide.guide_id} className={styles.guideCard}>
+                                    <img
+                                        src={guide.photo || "https://via.placeholder.com/100"}
+                                        alt={guide.name}
+                                        className={styles.guidePhoto}
+                                    />
+                                    <h4>{guide.name}</h4>
+                                    <p><strong>Languages:</strong> {guide.language_spoken}</p>
+                                    <p><strong>Location:</strong> {guide.location}</p>
+                                    <p><strong>Rating:</strong> ⭐ {guide.rating} ({guide.total_reviews} reviews)</p>
+                                    <p><strong>Availability:</strong></p>
+                                    <ul>
+                                        {guide.availability.map((a, idx) => (
+                                            <li key={idx}>{a.date} – {a.slots.join(", ")}</li>
+                                        ))}
+                                    </ul>
+                                    <button
+                                        onClick={() => window.open(`https://wa.me/${guide.phone.replace(/\D/g, '')}`, '_blank')}
+                                        className={styles.contactGuideButton}
+                                    >
+                                        📲 Contact Guide
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             )}
 
 
 
-            {tour.tour_itinerary && tour.tour_itinerary.length > 0 && (
-                <section className={styles.tourSection}>
-                    <h2>Tour Itinerary</h2>
-                    <TourItinerary itineraries={JSON.parse(tour.tour_itinerary || '[]')} />
-                </section>
+            {selectedCategory === "Tour Owner Info" && vendor && (
+                <div className={styles.guideSection}>
+                    <h3>🏢📋 About the Tour Vendor</h3>
+                    <div className={styles.guideList}>
+                        <div className={styles.guideCard}>
+                            <img
+                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(vendor.name)}&background=random`}
+                                alt={vendor.name}
+                                className={styles.guidePhoto}
+                            />
+
+                            <h4>{vendor.name}</h4>
+                            <p><strong>Email:</strong> {vendor.email || "Not provided"}</p>
+                            <p><strong>Phone:</strong> {vendor.phone || "Not provided"}</p>
+                            <p><strong>WhatsApp:</strong> {vendor.whatsapp || "Not provided"}</p>
+                            <p><strong>Rating:</strong> ⭐ {vendor.rating || "No rating yet"}</p>
+                            <p>
+                                <strong>License:</strong>
+                                {vendor.license_number
+                                    ? `${vendor.license_number}${vendor.license_expiry ? ` (expires on ${new Date(vendor.license_expiry).toLocaleDateString()})` : ""}`
+                                    : "No license information available"}
+                            </p>
+
+                            <p><strong>Certifications:</strong></p>
+                            <ul>
+                                {vendor.certifications?.length > 0
+                                    ? vendor.certifications.map((cert, idx) => <li key={idx}>{cert}</li>)
+                                    : <li>No certifications listed</li>}
+                            </ul>
+
+                            <p><strong>Awards:</strong></p>
+                            <ul>
+                                {vendor.awards?.length > 0
+                                    ? vendor.awards.map((award, idx) => <li key={idx}>{award}</li>)
+                                    : <li>No awards listed</li>}
+                            </ul>
+
+                            <p><strong>Description:</strong></p>
+                            <p>{vendor.description || "No description available."}</p>
+
+                            <button
+                                disabled={!vendor.whatsapp}
+                                onClick={() => vendor.whatsapp && window.open(`https://wa.me/${vendor.whatsapp.replace(/\D/g, '')}`, '_blank')}
+                                className={styles.contactGuideButton}
+                            >
+                                📲 Contact Vendor
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
 
 
 
-            <div style={{ height: '300px' }}></div>
-
-            {selectedCategory === 'Tips for Visitors' &&
-                <section className={styles.tourSection}>
-                    <h2>Tips for Visitors</h2>
+            {selectedCategory === 'Tips for Visitors' && (
+                <section className={styles.tourSection} style={{ paddingTop: '0rem', marginTop: '-1rem' }}>
                     <ul>
-                        {(tour.tips || '').split(';').map((item, idx) => (
-                            <li key={idx}>{item.trim()}</li>
-                        ))}
+                        {(() => {
+                            let tips = tour.tips;
+                            if (typeof tips === 'string' && tips.trim().startsWith('[')) {
+                                try {
+                                    tips = JSON.parse(tips);
+                                } catch (e) {
+                                    console.error("Parsing error:", e);
+                                    tips = [];
+                                }
+                            }
+
+                            return (tips || []).map((item, idx) => (
+                                <li key={idx}>{item.trim()}</li>
+                            ));
+                        })()}
                     </ul>
                 </section>
-            }
+            )}
+
+
 
         </div >
     );

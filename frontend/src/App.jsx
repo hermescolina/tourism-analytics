@@ -77,7 +77,6 @@ export default function App() {
 
         <Route path="/payment-instructions/:reference_id" element={<PaymentInstructionsPage />} />
 
-        {/* <Route path="/admin/tour-itinerary" element={<TourItinerary />} /> */}
 
         <Route path="/upload-itinerary/:slug" element={<TourDetailsAdmin />} />
 
