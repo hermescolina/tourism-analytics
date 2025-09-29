@@ -1,8 +1,25 @@
 import os
 import time
 import secrets
+import json
+import hashlib   
 
-from flask import Flask, request, jsonify, send_from_directory
+from decimal import Decimal, InvalidOperation
+
+from flask import (
+    Flask,
+    current_app,
+    request,
+    jsonify,
+    make_response,
+    send_from_directory,
+)
+
+from mysql.connector import Error as MySQLError
+
+from datetime import datetime, timezone
+
+
 import mimetypes
 
 from flask_cors import CORS
@@ -10,23 +27,60 @@ from werkzeug.utils import secure_filename
 import mysql.connector
 from dotenv import load_dotenv
 
+
+
 from fb_auto_post import fb_bp, post_tour_to_facebook_internal
 from cart_routes import cart_bp
 from voucher_routes import voucher_bp
 from payment_routes import payment_bp
 from booking_routes import confirm_bp
 from tour_routes import tours_bp
+from app_categories import bp_categories
+from bp_hotel_rooms import rooms_bp
+from bp_xendit_webhook import bp_xendit
+from cache_tourpage import bp_tourpages
+
+
+
 from voucher_routes import send_confirmation_email
 
+# --- Flask app FIRST ---
+app = Flask(__name__)
 
-from db_helpers import get_tour_from_db_by_slug, update_tour_in_db_by_id
+
+CORS(app,
+    resources={r"/api/*": {
+        "origins": [
+            "http://localhost:5173",
+            "http://127.0.0.1:5173",
+            "https://app.tourwise.shop"
+        ],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        # ⬇️ keep your existing headers and ADD the two custom ones
+        "allow_headers": ["Content-Type", "Authorization", "If-None-Match", "X-Cache-Strategy"],
+        # ⬇️ expose ETag so your JS can read res.headers.get('ETag')
+        "expose_headers": ["ETag"],
+    }},
+    # optional, only if you use cookies:
+    # supports_credentials=True
+)
+
+from tours_db_helpers import (
+    get_tour_from_db_by_slug,
+    update_tour_in_db_by_id,
+    get_tour_tips_from_db_by_slug,
+    update_tour_tips_by_slug,
+    post_tour_tips_from_db_by_slug,
+)
+
 
 # Register MIME types
 mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("text/css", ".css")
 
 # ✅ Load environment variables from .env.tours
-load_dotenv(dotenv_path=".env.tours")
+env_file = ".env.development" if os.getenv("APP_ENV") == "development" else ".env.tours"
+load_dotenv(dotenv_path=env_file)
 
 # ✅ DB config from environment
 db_name = os.getenv("TOUR_DB_NAME")
@@ -64,7 +118,9 @@ cars_db_config = {
 # def generate_confirmation_token(email):
 def generate_token(length=32):
     return secrets.token_urlsafe(length)
-
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://app.tourwise.shop",
 
 # ✅ One-time reusable connection function
 
@@ -72,23 +128,27 @@ def generate_token(length=32):
 def get_db_connection():
     return mysql.connector.connect(**tours_db_config)
 
+# cache datetime etag helper
+def _to_dt(val):
+    if not val:
+        return None
+    if isinstance(val, datetime):
+        return val if val.tzinfo else val.replace(tzinfo=timezone.utc)
+    s = str(val).replace("Z", "+00:00")
+    try:
+        dt = datetime.fromisoformat(s)
+        return dt if dt.tzinfo else dt.replace(tzinfo=timezone.utc)
+    except Exception:
+        try:
+            # common MySQL format
+            dt = datetime.strptime(s, "%Y-%m-%d %H:%M:%S")
+            return dt.replace(tzinfo=timezone.utc)
+        except Exception:
+            return None
+
 
 print("🔥 Connecting to HOTEL DB at:", hotels_db_config["host"])
 print("🧪 HOTEL DB CONFIG:", hotels_db_config)
-
-
-app = Flask(__name__)
-# 🔧 Enable CORS on all routes starting with /api
-CORS(
-    app,
-    resources={
-        r"/api/*": {
-            "origins": "https://app.tourwise.shop",
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": "*",
-        }
-    },
-)
 
 
 # ✅ Upload folder setup
@@ -120,7 +180,8 @@ def add_tour():
             image_filename = f"{slug}_{secure_filename(image.filename)}"
             image.save(os.path.join(app.config["UPLOAD_FOLDER"], image_filename))
 
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         cursor = db.cursor()
 
         # Check for slug duplication
@@ -157,6 +218,16 @@ def add_tour():
                 image_filename,
                 category_id,
                 "tour",
+            ),
+        )
+        db.commit()
+
+        cursor.execute(
+            """
+            INSERT INTO tours(tour_id) value(%s)
+            """,
+            (
+                new_item_id,
             ),
         )
         db.commit()
@@ -202,16 +273,17 @@ def serve_image(filename):
 def get_landing_data():
     print("👋 Landing data route called!", flush=True)
 
-    db_tours = mysql.connector.connect(**tours_db_config)
+    # db_tours = mysql.connector.connect(**tours_db_config)
+    db_tours = get_db_connection()
     with db_tours.cursor(dictionary=True) as cursor:
         cursor.execute(
             """
             (
-                SELECT * FROM vw_landing_page WHERE type = 'tour' ORDER BY id ASC LIMIT 3
+                SELECT * FROM vw_landing_page WHERE type = 'tour' ORDER BY item_id ASC LIMIT 3
             )
             UNION ALL
             (
-                SELECT * FROM vw_landing_page WHERE type = 'hotel' ORDER BY id ASC LIMIT 3
+                SELECT * FROM vw_landing_page WHERE type = 'hotel' ORDER BY item_id ASC LIMIT 3
             );
         """
         )
@@ -232,33 +304,72 @@ def get_landing_data():
         elif raw_image.startswith("images/"):
             tour["image"] = f"/{raw_image}"
         elif raw_image:
-            tour["image"] = f"/uploads/{raw_image}"
+            tour["image"] = f"/{raw_image}"
         else:
             tour["image"] = ""
 
         processed_tours.append(tour)
 
-    # Connect to hotels DB
+        # ---- ETag helpers ---------------------------------------------------
+    ts_candidates = []
 
-    return jsonify({"topItems": processed_tours})
+    if isinstance(tours, dict):
+        item_ids = tours.get("item_id")
+    elif isinstance(tours, list):
+        item_ids = [t.get("item_id") for t in tours if isinstance(t, dict)]
+    else:
+        item_ids = None
 
+    # top-level
+    for key in ("updated_at", "created_at"):
+        if key in tours:
+            dt = _to_dt(tours.get(key))
+            if dt: ts_candidates.append(dt)
 
+    latest_ts = max(ts_candidates).timestamp() if ts_candidates else 0.0
+
+    # Stable ETag basis (adjust as you like)
+    etag_basis = f'{item_ids}|{latest_ts}'
+    etag = hashlib.md5(etag_basis.encode("utf-8")).hexdigest()
+    
+
+    # ---- 304 handling ---------------------------------------------------
+    # Use Werkzeug's parsed ETags for correctness (quotes/weak tags/multiple)
+    # inm = request.if_none_match  # ETags object or empty
+    inm = request.headers.get("If-None-Match")
+
+    print("HEADERS ===>",request.headers,flush=True)
+
+    if inm == f"\"{etag}\"":
+        resp = make_response("", 304)
+        resp.set_etag(etag)
+        resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
+        resp.headers["Access-Control-Expose-Headers"] = "ETag"
+        return resp
+
+        
+    print("TD INM etag 222 ===>", etag, flush=True)
+    # Fresh body
+    resp = make_response(jsonify(processed_tours), 200)
+    resp.set_etag(etag)  # sets a quoted tag
+    resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
+    resp.headers["Access-Control-Expose-Headers"] = "ETag"
+    return resp
+
+    # return jsonify({"topItems": processed_tours})
+
+#1234
 # ✅ Landing data
-@app.route("/api/tour-data")
-def get_tour_data():
+@app.route("/api/touradmin-data")
+def get_touradmin_data():
     print("👋 Tour data route called!", flush=True)
 
-    db_tours = mysql.connector.connect(**tours_db_config)
+    # db_tours = mysql.connector.connect(**tours_db_config)
+    db_tours = get_db_connection()
     with db_tours.cursor(dictionary=True) as cursor:
         cursor.execute(
             """
-            (
-                SELECT * FROM vw_landing_page WHERE type = 'tour' ORDER BY id ASC
-            )
-            UNION ALL
-            (
-                SELECT * FROM vw_landing_page WHERE type = 'hotel' ORDER BY id ASC
-            );
+            SELECT * FROM vw_touradmin_page;
         """
         )
         tours = cursor.fetchall()
@@ -289,67 +400,214 @@ def get_tour_data():
     return jsonify({"topTours": processed_tours})
 
 
-# # ✅ Get tour by slug (with history images)
+@app.route("/api/tour-data")
+def get_tour_data():
+    print("👋 Tour admin data route called!", flush=True)
+
+    # db_tours = mysql.connector.connect(**tours_db_config)
+    db_tours = get_db_connection()
+    with db_tours.cursor(dictionary=True) as cursor:
+        cursor.execute(
+            """
+            (
+                SELECT * FROM vw_landing_page WHERE type = 'tour' ORDER BY item_id ASC
+            )
+            UNION ALL
+            (
+                SELECT * FROM vw_landing_page WHERE type = 'hotel' ORDER BY item_id ASC
+            );
+        """
+        )
+        tours = cursor.fetchall()
+
+    db_tours.close()
+
+    # Process tours
+    processed_tours = []
+    for tour in tours:
+        if not tour:
+            continue  # skip if None
+        raw_image = (tour.get("image") or "").lstrip("/")
+        if raw_image.startswith("uploads/"):
+            tour["image"] = f"/{raw_image}"
+        elif raw_image.startswith("images/"):
+            tour["image"] = f"/{raw_image}"
+        elif raw_image:
+            tour["image"] = f"/uploads/{raw_image}"
+        else:
+            tour["image"] = ""
+
+        processed_tours.append(tour)
+
+    # ---- ETag helpers ---------------------------------------------------
+    ts_candidates = []
+
+    if isinstance(tours, dict):
+        item_ids = tours.get("item_id")
+    elif isinstance(tours, list):
+        item_ids = [t.get("item_id") for t in tours if isinstance(t, dict)]
+    else:
+        item_ids = None
+
+    # top-level
+    for key in ("updated_at", "created_at"):
+        if key in tours:
+            dt = _to_dt(tours.get(key))
+            if dt: ts_candidates.append(dt)
+
+    latest_ts = max(ts_candidates).timestamp() if ts_candidates else 0.0
+
+    # Stable ETag basis (adjust as you like)
+    etag_basis = f'{item_ids}|{latest_ts}'
+    etag = hashlib.md5(etag_basis.encode("utf-8")).hexdigest()
+    
+
+    # ---- 304 handling ---------------------------------------------------
+    # Use Werkzeug's parsed ETags for correctness (quotes/weak tags/multiple)
+    # inm = request.if_none_match  # ETags object or empty
+    inm = request.headers.get("If-None-Match")
+
+    if inm == f"\"{etag}\"":
+        resp = make_response("", 304)
+        resp.set_etag(etag)
+        resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
+        resp.headers["Access-Control-Expose-Headers"] = "ETag"
+        return resp
+
+        
+    print("TD INM etag ===>", etag, flush=True)
+    # Fresh body
+    resp = make_response(jsonify(processed_tours), 200)
+    resp.set_etag(etag)  # sets a quoted tag
+    resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
+    resp.headers["Access-Control-Expose-Headers"] = "ETag"
+    return resp
+    # return jsonify({"topTours": processed_tours})
+
+
+# ✅ Get tour by slug (with history images)
+
+
+# ✅ Get tour by slug (with history images)
 @app.route("/api/tours/<slug>")
 def get_tour_by_slug(slug):
+    db = None
     try:
-        db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor(dictionary=True) as cursor:
-            # 🔍 Get main tour info
-            cursor.execute(
-                "SELECT * FROM vw_tour_page WHERE slug = %s LIMIT 1", (slug,)
-            )
+            # 🔍 Main tour
+            cursor.execute("SELECT * FROM vw_tour_page WHERE slug = %s LIMIT 1", (slug,))
             tour = cursor.fetchone()
-
             if not tour:
                 return jsonify({"error": "Tour not found"}), 404
 
+            # 🏪 Vendor
+            cursor.execute(
+                """
+                SELECT v.vendor_id, v.name, v.email, v.status, v.created_at
+                FROM vendors v
+                JOIN items i ON v.vendor_id = i.vendor_id
+                WHERE i.item_id = %s
+                """,
+                (tour["item_id"],),
+            )
+            vendor = cursor.fetchone() or {}
+            tour["vendor"] = vendor
+
             # 🖼️ Fix main image path
             if tour.get("image"):
-                image_path = tour["image"].lstrip("/")
+                image_path = str(tour["image"]).lstrip("/")
                 tour["image"] = f"/uploads/{image_path}"
 
-            # 🖼️ Get related history images
+            # 🖼️ History images
             cursor.execute(
                 """
                 SELECT image_path, caption, category, created_at
                 FROM tour_history_images
                 WHERE tour_id = %s
                 ORDER BY created_at DESC
-            """,
+                """,
                 (tour["item_id"],),
             )
-            history_images = cursor.fetchall()
-
-            # Fix image paths
+            history_images = cursor.fetchall() or []
             for img in history_images:
-                path = img["image_path"].lstrip("/")
-                img["image_path"] = (
-                    f"/uploads/{path}" if not path.startswith("http") else path
-                )
-
+                path = str(img.get("image_path", "")).lstrip("/")
+                img["image_path"] = f"/uploads/{path}" if not path.startswith("http") else path
             tour["history_images"] = history_images
 
-            # 🎬 Get related tour videos
+            # 🎬 Videos
             cursor.execute(
                 """
-                SELECT video_id, caption, category
+                SELECT video_id, caption, category, created_at
                 FROM tour_videos
                 WHERE tour_id = %s
                 ORDER BY created_at DESC
-            """,
+                """,
                 (tour["item_id"],),
             )
-            videos = cursor.fetchall()
-
+            videos = cursor.fetchall() or []
             tour["videos"] = videos
 
-        db.close()
-        return jsonify(tour)
+        # ---- ETag helpers ---------------------------------------------------
+        ts_candidates = []
+        KEYS = ("updated_at", "created_at")
+
+        # top-level
+        for k in KEYS:
+            dt = _to_dt(tour.get(k))
+            if dt: ts_candidates.append(dt)
+
+        # vendor
+        for k in KEYS:
+            dt = _to_dt(vendor.get(k))
+            if dt: ts_candidates.append(dt)
+
+        # images
+        for img in history_images:
+            for k in KEYS:
+                dt = _to_dt(img.get(k))
+                if dt: ts_candidates.append(dt)
+
+        # videos
+        for vid in videos:
+            for k in KEYS:
+                dt = _to_dt(vid.get(k))
+                if dt: ts_candidates.append(dt)
+
+        latest_ts = max(ts_candidates).timestamp() if ts_candidates else 0.0
+
+        # Stable ETag basis (adjust as you like)
+        etag_basis = f'{tour.get("item_id")}|{latest_ts}|imgs:{len(history_images)}|vids:{len(videos)}'
+        etag = hashlib.md5(etag_basis.encode("utf-8")).hexdigest()
+
+        # ---- 304 handling ---------------------------------------------------
+        # Use Werkzeug's parsed ETags for correctness (quotes/weak tags/multiple)
+        inm = request.if_none_match  # ETags object or empty
+
+        if inm and inm.contains(etag):
+            resp = make_response("", 304)
+            resp.set_etag(etag)
+            resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
+            resp.headers["Access-Control-Expose-Headers"] = "ETag"
+            return resp
+
+        # Fresh body
+        resp = make_response(jsonify(tour), 200)
+        resp.set_etag(etag)  # sets a quoted tag
+        resp.headers["Cache-Control"] = "private, max-age=0, must-revalidate"
+        resp.headers["Access-Control-Expose-Headers"] = "ETag"
+        return resp
 
     except Exception as e:
-        print("❌ Error in get_tour_by_slug:", e)
+        print("❌ Error in get_tour_by_slug:", e, flush=True)
         return jsonify({"error": str(e)}), 500
+    finally:
+        if db:
+            try:
+                db.close()
+            except Exception:
+                pass
+
 
 
 # ✅ Update a tour by slug
@@ -368,7 +626,8 @@ def update_tour(slug):
         image = request.files.get("image")
         image_filename = None
 
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor() as cursor:
             if image:
                 image_filename = f"{slug}_{secure_filename(image.filename)}"
@@ -425,7 +684,8 @@ def update_tour(slug):
 @app.route("/api/tours/<slug>/history-image", methods=["POST"])
 def upload_history_image(slug):
     try:
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor() as cursor:
             cursor.execute("SELECT id FROM tours WHERE slug = %s", (slug,))
             result = cursor.fetchone()
@@ -469,7 +729,8 @@ def update_history_image(image_id):
     caption = request.form.get("caption")
     file = request.files.get("image")
 
-    conn = mysql.connector.connect(**tours_db_config)
+    # conn = mysql.connector.connect(**tours_db_config)
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     if caption:
@@ -494,7 +755,8 @@ def update_history_image(image_id):
 
 @app.route("/api/history-image/<int:image_id>", methods=["DELETE"])
 def delete_history_image(image_id):
-    conn = mysql.connector.connect(**tours_db_config)
+    # conn = mysql.connector.connect(**tours_db_config)
+    conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM tour_history_images WHERE id=%s", (image_id,))
     conn.commit()
@@ -505,7 +767,8 @@ def delete_history_image(image_id):
 
 @app.route("/api/history-images/<slug>", methods=["GET"])
 def get_history_images(slug):
-    conn = mysql.connector.connect(**tours_db_config)
+    # conn = mysql.connector.connect(**tours_db_config)
+    conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute(
@@ -526,6 +789,15 @@ def get_history_images(slug):
     return jsonify(images)
 
 
+
+@app.route("/api/testing", methods=["POST","OPTIONS"])
+def api_testing():
+    print("WELCOME TO API WORLD",flush=True)
+    description = request.form["description"]
+    print("CAPTION ==>", description,flush=True)
+    return ("watch out I am comming!")
+    
+
 @app.route("/api/tours/<slug>/save-video", methods=["POST", "OPTIONS"])
 def save_video_embed(slug):
     try:
@@ -542,7 +814,8 @@ def save_video_embed(slug):
             print("⚠️ Missing video_id in form data.")
             return jsonify({"error": "Video ID is required"}), 400
 
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor() as cursor:
             print(f"🔍 Looking up tour ID for slug: '{slug}'")
             cursor.execute("SELECT id FROM tours WHERE slug = %s", (slug,))
@@ -573,11 +846,11 @@ def save_video_embed(slug):
         print("❌ Error in save_video_embed:", e)
         return jsonify({"error": str(e)}), 500
 
-
 @app.route("/api/tours/<slug>/videos")
 def get_tour_videos(slug):
     try:
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor(dictionary=True) as cursor:
             cursor.execute("SELECT item_id FROM vw_tour_page  WHERE slug = %s", (slug,))
             result = cursor.fetchone()
@@ -607,7 +880,8 @@ def get_tour_videos(slug):
 @app.route("/api/tours/<slug>/video/<int:video_id>", methods=["DELETE"])
 def delete_tour_video(slug, video_id):
     try:
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor() as cursor:
             # Verify tour exists
             cursor.execute("SELECT item_id FROM vw_tour_page WHERE slug = %s", (slug,))
@@ -633,7 +907,8 @@ def delete_tour_video(slug, video_id):
 
 @app.route("/api/history-images/<slug>/<int:image_id>", methods=["DELETE"])
 def delete_history_image_by_slug(slug, image_id):
-    conn = mysql.connector.connect(**tours_db_config)
+    # conn = mysql.connector.connect(**tours_db_config)
+    conn = get_db_connection()
     cursor = conn.cursor()
 
     # Optional: validate tour slug
@@ -662,7 +937,8 @@ def update_tour_video(slug, video_id):
         if not category:
             return jsonify({"error": "category is required"}), 400
 
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor() as cursor:
             cursor.execute(
                 """
@@ -685,7 +961,8 @@ def update_tour_video(slug, video_id):
 @app.route("/api/tours/list", methods=["GET"])
 def list_all_tours():
     try:
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor(dictionary=True) as cursor:
             cursor.execute(
                 "SELECT item_id, slug, title FROM vw_tour_page ORDER BY title ASC"
@@ -701,7 +978,8 @@ def list_all_tours():
 @app.route("/api/tours/<slug>/history-images", methods=["GET"])
 def get_tour_history_images(slug):
     try:
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor(dictionary=True) as cursor:
             query = """
                 SELECT h.id, h.image_path AS url, h.caption, h.category
@@ -721,7 +999,8 @@ def get_tour_history_images(slug):
 @app.route("/api/categories", methods=["GET"])
 def get_categories():
     try:
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor(dictionary=True) as cursor:
             cursor.execute("SELECT id, name FROM categories ORDER BY name ASC")
             categories = cursor.fetchall()
@@ -747,7 +1026,8 @@ def book_tour():
     confirmation_token = generate_token()
 
     try:
-        conn = mysql.connector.connect(**tours_db_config)
+        # conn = mysql.connector.connect(**tours_db_config)
+        conn = get_db_connection()
         cursor = conn.cursor()
 
         # 🔍 Fetch vendor_id and vendor_email from tour
@@ -804,11 +1084,12 @@ def book_tour():
         return jsonify({"error": str(e)}), 500
 
 
-@app.route("/api/delete-tour/<int:tour_id>", methods=["DELETE"])
-def delete_tour(tour_id):
-    conn = mysql.connector.connect(**tours_db_config)
+@app.route("/api/delete-tour/<slug>", methods=["DELETE", "OPTIONS"])
+def delete_tour(slug):
+    # conn = mysql.connector.connect(**tours_db_config)
+    conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM tours WHERE id=%s", (tour_id,))
+    cursor.execute("DELETE FROM items WHERE slug = %s", (slug,))
     conn.commit()
     cursor.close()
     conn.close()
@@ -818,7 +1099,8 @@ def delete_tour(tour_id):
 @app.route("/api/tours-list", methods=["GET"])
 def get_tour_list():
     try:
-        db = mysql.connector.connect(**tours_db_config)
+        # db = mysql.connector.connect(**tours_db_config)
+        db = get_db_connection()
         with db.cursor(dictionary=True) as cursor:
             cursor.execute(
                 """
@@ -861,9 +1143,10 @@ def update_tour_itinerary(slug):
     data = request.get_json()
 
     # ✅ Fetch item_id (tour ID) from vw_tour_page using slug
-    conn = mysql.connector.connect(**tours_db_config)
+    # conn = mysql.connector.connect(**tours_db_config)
+    conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT item_id FROM vw_tour_page WHERE slug = %s", (slug,))
+    cursor.execute("SELECT item_id,item_type FROM vw_touradmin_page WHERE slug = %s", (slug,))
     result = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -871,73 +1154,81 @@ def update_tour_itinerary(slug):
     if not result:
         return jsonify({"error": "Tour not found"}), 404
 
-    tour_id = result["item_id"]  # ✅ Extract the real tour ID
+    tour_id = result["item_id"] 
+    item_type = result["item_type"] 
 
     # ✅ Validate itinerary format
     if not isinstance(data.get("tour_itinerary", []), list):
         return jsonify({"error": "Invalid itinerary format"}), 400
 
     # ✅ Update using ID instead of slug
-    update_tour_in_db_by_id(tour_id, data)
+    update_tour_in_db_by_id(tour_id, item_type, data)
     return jsonify({"message": "Tour updated"})
 
 
-from flask_cors import cross_origin
-
-
-@app.route("/api/tour-tips/<slug>", methods=["GET", "PUT", "OPTIONS"])
-@cross_origin(
-    origins=["https://app.tourwise.shop"],
-    methods=["GET", "PUT", "OPTIONS"],
-    allow_headers="*",
-)
+@app.route("/api/tour-tips/<slug>", methods=["GET", "PUT", "POST", "OPTIONS"])
 def tour_tips(slug):
-    if request.method == "GET":
-        # You can implement GET logic here if needed
-        ...
+    ORIGIN = "http://localhost:5173"
 
-    elif request.method == "PUT":
-        print("✅ PUT request to /api/tour-tips received")
-        try:
-            data = request.get_json()
-            print("📥 Data received:", data)
+    if request.method == "OPTIONS":
+        return ("", 204, {
+            "Access-Control-Allow-Origin": ORIGIN,
+            "Access-Control-Allow-Methods": "GET,PUT,POST,OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+            "Vary": "Origin",
+        })
 
-            if not data or "tips" not in data:
-                return jsonify({"error": "Missing tips in request"}), 400
+    try:
+        if request.method == "GET":
+            tips = get_tour_tips_from_db_by_slug(slug)  # returns a Python list
+            resp = jsonify({"tips": tips})
+            resp.headers["Access-Control-Allow-Origin"] = ORIGIN
+            return resp, 200
 
-            new_tips = data["tips"]
-            print("📝 New tips:", new_tips)
+        # PUT/POST share the same body handling
+        data = request.get_json(silent=True) or {}
+        if "tips" not in data:
+            resp = jsonify({"error": "Missing tips in request"})
+            resp.headers["Access-Control-Allow-Origin"] = ORIGIN
+            return resp, 400
 
-            # ✅ Fetch item_id from vw_tour_page using slug
-            conn = mysql.connector.connect(**tours_db_config)
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("SELECT item_id FROM vw_tour_page WHERE slug = %s", (slug,))
-            result = cursor.fetchone()
+        if request.method == "PUT":
+            data = request.get_json(silent=True) or {}
+            if "tips" not in data:
+                resp = jsonify({"error": "Missing tips in request"})
+                resp.headers["Access-Control-Allow-Origin"] = ORIGIN
+                return resp, 400
 
-            if not result:
-                cursor.close()
-                conn.close()
-                return jsonify({"error": "Tour not found"}), 404
+            try:
+                affected = update_tour_tips_by_slug(slug, data["tips"])  # should return int
+                msg = "Tips updated successfully" if affected else "No change (already up to date)"
+                resp = jsonify({"message": msg, "affected": affected})
+                resp.headers["Access-Control-Allow-Origin"] = ORIGIN
+                resp.headers["Vary"] = "Origin"
+                return resp, 200
+            except LookupError:
+                resp = jsonify({"error": "Tour not found"})
+                resp.headers["Access-Control-Allow-Origin"] = ORIGIN
+                return resp, 404
 
-            tour_id = result["item_id"]
-            cursor.close()
 
-            # ✅ Update tips in tours table using the real tour_id
-            cursor = conn.cursor()
-            cursor.execute(
-                "UPDATE tours SET tips = %s WHERE id = %s", (new_tips, tour_id)
-            )
-            conn.commit()
-            cursor.close()
-            conn.close()
+        if request.method == "POST":
+            # Same as PUT; keep if you want both verbs
+            affected = update_tour_tips_by_slug(slug, data["tips"])
+            resp = jsonify({"message": "Tips saved", "affected": affected})
+            resp.headers["Access-Control-Allow-Origin"] = ORIGIN
+            return resp, 200
 
-            return jsonify({"message": "Tips updated successfully"})
+    except LookupError:
+        resp = jsonify({"error": "Tour not found"})
+        resp.headers["Access-Control-Allow-Origin"] = ORIGIN
+        return resp, 404
+    except Exception as e:
+        print("❌ Exception while saving tips:", e, flush=True)
+        resp = jsonify({"error": "Failed to process tips"})
+        resp.headers["Access-Control-Allow-Origin"] = ORIGIN
+        return resp, 500
 
-        except Exception as e:
-            print("❌ Exception while saving tips:", e)
-            return jsonify({"error": "Failed to update tips"}), 500
-
-    return "", 204
 
 
 app.register_blueprint(fb_bp, url_prefix="/api/fb")
@@ -946,16 +1237,31 @@ app.register_blueprint(payment_bp, url_prefix="/api/pay")
 app.register_blueprint(confirm_bp, url_prefix="/api/cf")
 app.register_blueprint(voucher_bp, url_prefix="/api/vr")
 app.register_blueprint(tours_bp, url_prefix="/api/tr")
+app.register_blueprint(bp_categories, url_prefix="/api/cat")
+app.register_blueprint(rooms_bp, url_prefix="/api/hr")
+app.register_blueprint(bp_xendit, url_prefix="/api/xen")
+app.register_blueprint(bp_tourpages, url_prefix="/api/tp")
+# app.register_blueprint(bp_xendit)  # no prefix; route already starts with /api
 
+
+# ... your imports and routes above
+
+# ✅ Debug route to list all registered routes
+@app.get("/__routes")
+def __routes():
+    return [str(r) for r in app.url_map.iter_rules()]
 
 # ✅ Run locally or with Gunicorn/Render
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 3001))
+
+    # Optional: print all routes on startup
     print("\n📅 Registered routes:")
     for rule in app.url_map.iter_rules():
         print(f"{rule} → {', '.join(rule.methods)}")
 
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, debug=True)
+
 
 
 @app.after_request

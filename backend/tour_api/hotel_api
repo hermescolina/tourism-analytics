@@ -1,0 +1,8 @@
+curl -X POST http://localhost:3001/api/hr/rooms/seed/3 \
+  -H "Content-Type: application/json" \
+  -d '{
+    "rooms": [
+      {"room_type":"Standard Room","bed_type":"Queen Bed","size_sqm":24,"occupancy":2,"description":"Cozy standard."},
+      {"room_type":"Deluxe Room","bed_type":"King Bed","size_sqm":36,"occupancy":2,"description":"Upgraded deluxe."}
+    ]
+  }'

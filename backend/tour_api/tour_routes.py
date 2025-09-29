@@ -77,18 +77,19 @@ def get_vendor(vendor_id):
         cursor.execute(
             """
             SELECT 
-                id, 
+                vendors_id, 
                 name, 
                 email, 
                 phone, 
                 whatsapp, 
-                created_at, 
                 license_number, 
                 license_expiry, 
                 certifications, 
                 awards, 
                 description, 
-                rating 
+                rating,
+                status,
+                created_at
             FROM vendors 
             WHERE id = %s
             """,
